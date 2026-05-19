@@ -121,6 +121,16 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+
+html, body {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+/* Better media containment */
+.container, .section, .page-header, .cards-grid, .card, .card-body, .card-title, .card-desc {
+  min-width: 0;
+}
 /* Mobile: reserve room for bottom nav */
 @media (max-width: 767px) { body { padding-bottom: 64px; } }
 
@@ -879,3 +889,134 @@ body.dark .stats-ribbon { background: #040e0d; }
 
 /* ── Font size scaling on small tablets ──────────────────── */
 @media (max-width: 900px) { html { font-size: 14px; } }
+
+
+/* ── Comprehensive responsive hardening ───────────────────── */
+:root { --max-width: min(1180px, calc(100vw - 2rem)); }
+
+.cards-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+}
+.cards-grid > .card,
+.cards-grid > .skeleton-card {
+  height: 100%;
+}
+
+/* Search/filter rows and compact mobile controls */
+.filter-row,
+.filter-left,
+.filter-right,
+.hero-search,
+.search-form-nav {
+  min-width: 0;
+}
+
+@media (max-width: 1024px) {
+  .nav-container { gap: 0.75rem; }
+  .footer-grid { gap: 1.25rem; }
+}
+
+@media (max-width: 768px) {
+  .container,
+  .nav-container,
+  .search-form-nav { width: min(calc(100% - 1.25rem), var(--max-width)); }
+
+  .hero-search-box,
+  .hero-search,
+  .hero-search-box form {
+    width: 100%;
+    max-width: 100%;
+    flex-direction: column;
+    gap: 0.65rem;
+    align-items: stretch;
+  }
+
+  .hero-search-input,
+  .hero-search-box .btn,
+  .hero-search button,
+  .search-form-nav button {
+    width: 100%;
+  }
+
+  .search-form-nav {
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
+  }
+
+  .filter-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .filter-left,
+  .filter-right {
+    display: grid;
+    grid-template-columns: 1fr;
+    width: 100%;
+    gap: 0.5rem;
+  }
+
+  .filter-select,
+  .btn-clear,
+  .filter-right .btn,
+  .filter-right button {
+    width: 100%;
+  }
+
+  .card,
+  .card-body,
+  .card-footer,
+  .card-details { min-width: 0; }
+
+  .card-footer {
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
+  }
+
+  .card-footer .btn-primary { flex: 1 1 100%; }
+
+  .footer-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .chatbot-panel {
+    width: min(92vw, 380px);
+    right: 12px;
+    left: auto;
+    bottom: 128px;
+    max-height: min(68vh, 560px);
+  }
+
+  .chatbot-toggle-btn {
+    right: 12px;
+    bottom: 76px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1180px) {
+  .cards-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1600px) {
+  :root { --max-width: 1440px; }
+  .cards-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .btn,
+  .nav-icon-btn,
+  .hamburger,
+  .cat-pill,
+  .mob-nav-item,
+  .card-footer button,
+  .card-footer a {
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+
+  .has-dropdown:hover .dropdown { display: none; }
+}
