@@ -1,0 +1,14 @@
+{
+  "name": "career-pakistan",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Career Pakistan static site and Vercel serverless APIs",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "echo 'No build step required for static site'",
+    "vercel-build": "npm run build"
+  }
+}
