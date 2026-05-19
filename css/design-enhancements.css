@@ -1,0 +1,11 @@
+/* Professional visual polish and consistent interaction patterns */
+:root{
+  --brand-grad:linear-gradient(135deg,#0ea5e9,#06b6d4);
+  --focus-ring:0 0 0 3px rgba(14,165,233,.28);
+}
+.card,.sidebar-card,.ad-slot-inner{transition:transform .2s ease,box-shadow .2s ease}
+.card:hover,.sidebar-card:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(2,6,23,.10)}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:none;box-shadow:var(--focus-ring);border-radius:8px}
+.page-header{background:radial-gradient(1200px 280px at 20% 0%,rgba(14,165,233,.10),transparent 60%)}
+.nav-logo img{filter:drop-shadow(0 3px 8px rgba(2,6,23,.18))}
+[data-theme="dark"] .card,[data-theme="dark"] .sidebar-card{box-shadow:0 10px 26px rgba(0,0,0,.35)}
