@@ -15,5 +15,47 @@
         }
       ]
     }
+  ],
+  "redirects": [
+    {
+      "source": "/job-government",
+      "destination": "/jobs-government",
+      "permanent": true
+    },
+    {
+      "source": "/job-government.html",
+      "destination": "/jobs-government.html",
+      "permanent": true
+    },
+    {
+      "source": "/job-private",
+      "destination": "/jobs-private",
+      "permanent": true
+    },
+    {
+      "source": "/job-private.html",
+      "destination": "/jobs-private.html",
+      "permanent": true
+    },
+    {
+      "source": "/jobsgovernment",
+      "destination": "/jobs-government",
+      "permanent": true
+    },
+    {
+      "source": "/jobsgovernment.html",
+      "destination": "/jobs-government.html",
+      "permanent": true
+    },
+    {
+      "source": "/jobsprivate",
+      "destination": "/jobs-private",
+      "permanent": true
+    },
+    {
+      "source": "/jobsprivate.html",
+      "destination": "/jobs-private.html",
+      "permanent": true
+    }
   ]
 }
