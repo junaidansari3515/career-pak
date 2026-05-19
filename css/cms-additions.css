@@ -6,3 +6,7 @@
 .empty-state{padding:1.25rem;border:1px dashed var(--border,#cbd5e1);border-radius:12px;background:var(--bg-card,#fff);text-align:center}
 .empty-state h3{margin:0 0 .35rem;color:var(--text-primary,#0f172a)}
 .empty-state p{margin:0;color:var(--text-secondary,#475569)}
+
+.cards-grid.is-loading{opacity:.6;pointer-events:none;transition:opacity .2s ease}
+.card-empty-state{border:1px dashed #94a3b8;background:#f8fafc}
+body.dark .card-empty-state{background:#1e293b;border-color:#475569}
