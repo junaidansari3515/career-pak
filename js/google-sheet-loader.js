@@ -36,7 +36,9 @@ const SHEETS_CONFIG = [
 ];
 
 window.CMS_DATA    = window.CMS_DATA    || {};
+window._CMS_SHEETS_LOADER_ACTIVE = true;
 window.CMS_LOADING = window.CMS_LOADING || {};
+window.CMS_LOADING.global = window.CMS_LOADING.global || false;
 
 // ── Utilities ─────────────────────────────────────────────────
 function _getField(r, keys) {
@@ -247,13 +249,59 @@ function _parseCSV(text) {
   return rows;
 }
 
+
+const CMS_FETCH_TIMEOUT_MS = 12000;
+const CMS_RETRY_ATTEMPTS = 2;
+const REQUIRED_FIELDS_BY_SHEET = {
+  Scholarships: ['title'], Jobs: ['title'], Internships: ['title'], Exams: ['title'], Books: ['title'], Blogs: ['title'], Notifications: ['message']
+};
+
+function withTimeout(promise, ms, label) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error(`${label} timeout after ${ms}ms`)), ms)),
+  ]);
+}
+
+async function fetchWithRetry(url, options, attempts, label) {
+  let lastError;
+  for (let i = 0; i <= attempts; i++) {
+    try {
+      return await withTimeout(fetch(url, options), CMS_FETCH_TIMEOUT_MS, label);
+    } catch (err) {
+      lastError = err;
+      if (i === attempts) break;
+      await new Promise((r) => setTimeout(r, 250 * (i + 1)));
+    }
+  }
+  throw lastError;
+}
+
+function validateAndNormalizeItems(sheetName, items) {
+  const required = REQUIRED_FIELDS_BY_SHEET[sheetName] || ['title'];
+  const out = [];
+  const seen = new Set();
+  for (const item of items || []) {
+    if (!item || typeof item !== 'object') continue;
+    const hasRequired = required.some((k) => String(item[k] ?? '').trim().length > 0);
+    if (!hasRequired) continue;
+    const id = String(item.id ?? '').trim();
+    const title = String(item.title ?? item.message ?? '').trim().toLowerCase();
+    const key = `${id}|${title}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(item);
+  }
+  return out;
+}
+
 // ── Load a single sheet ───────────────────────────────────────
 async function loadSheetData(sheetConfig) {
   try {
     // ✅ BUG FIX #7 — removed '&_t=' + Date.now() and cache: 'no-store'
     // cache: 'default' lets the browser + Vercel CDN cache the response
-    const response = await fetch(sheetConfig.csvUrl, { cache: 'default' });
-
+    const response = await fetchWithRetry(sheetConfig.csvUrl, { cache: 'default' }, CMS_RETRY_ATTEMPTS, sheetConfig.name);
+    
     if (!response.ok) throw new Error('HTTP ' + response.status);
     const text = await response.text();
 
@@ -274,19 +322,23 @@ async function loadSheetData(sheetConfig) {
       return obj;
     }).filter(obj => headers.some(h => obj[h] !== ''));
 
-    const mappedData = objects.map(sheetConfig.mapper).filter(item => item && item.title);
+    const mappedData = validateAndNormalizeItems(sheetConfig.name, objects.map(sheetConfig.mapper));
     window.CMS_DATA[sheetConfig.name] = mappedData;
     console.info(`[CMS] ✅ ${sheetConfig.name}: ${mappedData.length} items`);
     return mappedData;
   } catch (error) {
     console.error('[CMS] Failed to load', sheetConfig.name, error.message);
-    window.CMS_DATA[sheetConfig.name] = [];
-    return [];
+    // Keep previous data as fallback to avoid blank/flicker sections on transient failures
+    if (!Array.isArray(window.CMS_DATA[sheetConfig.name])) window.CMS_DATA[sheetConfig.name] = [];
+    return window.CMS_DATA[sheetConfig.name];
   }
 }
 
 // ── Load all sheets in parallel ───────────────────────────────
 async function loadAllSheets() {
+  if (window.CMS_LOADING.global) return;
+  window.CMS_LOADING.global = true;
+  document.dispatchEvent(new CustomEvent('cmsLoading', { detail: { loading: true } }));
   const promises = SHEETS_CONFIG.map(async (config) => {
     window.CMS_LOADING[config.name] = true;
     try {
@@ -306,6 +358,8 @@ async function loadAllSheets() {
   }
 
   window.dispatchEvent(new CustomEvent('cmsDataLoaded', { detail: { data: window.CMS_DATA } }));
+  document.dispatchEvent(new CustomEvent('cmsLoading', { detail: { loading: false } }));
+  window.CMS_LOADING.global = false;
 }
 
 // ── Boot ──────────────────────────────────────────────────────
