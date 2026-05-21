@@ -364,6 +364,29 @@ function renderMetaTags(values = []) {
   return tags.map((tag) => `<span class="card-tag">${escapeHtml(tag)}</span>`).join('');
 }
 
+
+function truncateText(value, maxLength = 120) {
+  const raw = text(value).replace(/\s+/g, ' ').trim();
+  if (!raw) return '';
+  if (raw.length <= maxLength) return raw;
+  return `${raw.slice(0, maxLength - 1).trimEnd()}…`;
+}
+
+function getCardImage(item = {}, type = '') {
+  const candidates = [
+    item.imageUrl, item.image_url, item.image, item.thumbnail, item.thumbnailUrl,
+    item.logo, item.banner, item.cover, item.photo
+  ];
+  for (const candidate of candidates) {
+    const src = imgSrc(candidate, type);
+    if (src) return src;
+  }
+  return null;
+}
+
+function cardExcerpt(item = {}) {
+  return truncateText(item.shortDescription || item.short_description || item.description || item.details || '', 115);
+}
 // ── Fallback image ───────────────────────────────────────────
 function imgSrc(url, type) {
   const clean = text(url).trim();
@@ -460,7 +483,7 @@ function openCardPost(id, type) {
 // ── Card renderers ───────────────────────────────────────────
 function cardScholarship(s) {
   const fav = isFav(s.id, 'scholarship');
-  const src = imgSrc(s.imageUrl, 'scholarship');
+  const src = getCardImage(s, 'scholarship');
   const imgHTML = src ? `<img src="${TRANSPARENT_PLACEHOLDER}" data-src="${escapeHtml(src)}" alt="${escapeHtml(s.title)}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : '';
   const loc = s.country || s.province || '';
   return `
@@ -478,6 +501,7 @@ function cardScholarship(s) {
         ${s.level ? `<span class="card-tag">${escapeHtml(s.level)}</span>` : ''}
       </div>
       <h3 class="card-title">${escapeHtml(s.title)}</h3>
+      <p class="card-desc">${escapeHtml(cardExcerpt(s))}</p>
       ${s.university ? `<p class="card-org"><i class="fa fa-university"></i> ${escapeHtml(s.university)}</p>` : ''}
       <div class="card-details">
         ${loc ? `<span><i class="fa fa-globe"></i> ${escapeHtml(loc)}</span>` : ''}
@@ -495,7 +519,7 @@ function cardScholarship(s) {
 
 function cardJob(j) {
   const fav = isFav(j.id, 'job');
-  const src = imgSrc(j.imageUrl, 'job');
+  const src = getCardImage(j, 'job');
   const imgHTML = src ? `<img src="${TRANSPARENT_PLACEHOLDER}" data-src="${escapeHtml(src)}" alt="${escapeHtml(j.title)}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : '';
   return `
   <div class="card" data-id="${j.id}" data-type="job" role="button" tabindex="0" aria-label="View ${escapeHtml(j.title)}">
@@ -512,6 +536,7 @@ function cardJob(j) {
         ${j.salary ? `<span class="card-tag" style="background:#d1fae5;color:#065f46;border-color:#6ee7b7"><i class="fa fa-money-bill-wave fa-xs"></i> ${escapeHtml(j.salary)}</span>` : ''}
       </div>
       <h3 class="card-title">${escapeHtml(j.title)}</h3>
+      <p class="card-desc">${escapeHtml(cardExcerpt(j))}</p>
       ${j.organization ? `<p class="card-org"><i class="fa fa-building"></i> ${escapeHtml(j.organization)}</p>` : ''}
       <div class="card-details">
         ${j.location ? `<span><i class="fa fa-map-marker-alt"></i> ${escapeHtml(j.location)}</span>` : ''}
@@ -529,7 +554,7 @@ function cardJob(j) {
 
 function cardInternship(i) {
   const fav = isFav(i.id, 'internship');
-  const src = imgSrc(i.imageUrl, 'internship');
+  const src = getCardImage(i, 'internship');
   const imgHTML = src ? `<img src="${TRANSPARENT_PLACEHOLDER}" data-src="${escapeHtml(src)}" alt="${escapeHtml(i.title)}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : '';
   const paidCls = (i.type||'').toLowerCase()==='paid' ? 'paid' : 'unpaid';
   return `
@@ -547,6 +572,7 @@ function cardInternship(i) {
         ${i.duration ? `<span class="card-tag"><i class="fa fa-hourglass-half fa-xs"></i> ${escapeHtml(i.duration)}</span>` : ''}
       </div>
       <h3 class="card-title">${escapeHtml(i.title)}</h3>
+      <p class="card-desc">${escapeHtml(cardExcerpt(i))}</p>
       ${i.organization ? `<p class="card-org"><i class="fa fa-building"></i> ${escapeHtml(i.organization)}</p>` : ''}
       <div class="card-details">
         ${i.location ? `<span><i class="fa fa-map-marker-alt"></i> ${escapeHtml(i.location)}</span>` : ''}
@@ -564,7 +590,7 @@ function cardInternship(i) {
 
 function cardExam(e) {
   const fav = isFav(e.id, 'exam');
-  const src = imgSrc(e.imageUrl, 'exam');
+  const src = getCardImage(e, 'exam');
   const imgHTML = src ? `<img src="${TRANSPARENT_PLACEHOLDER}" data-src="${escapeHtml(src)}" alt="${escapeHtml(e.title)}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : '';
   return `
   <div class="card" data-id="${e.id}" data-type="exam" role="button" tabindex="0" aria-label="View ${escapeHtml(e.title)}">
@@ -581,6 +607,7 @@ function cardExam(e) {
         ${e.province ? `<span class="card-tag"><i class="fa fa-map-marker-alt fa-xs"></i> ${escapeHtml(e.province)}</span>` : ''}
       </div>
       <h3 class="card-title">${escapeHtml(e.title)}</h3>
+      <p class="card-desc">${escapeHtml(cardExcerpt(e))}</p>
       ${e.conductingBody ? `<p class="card-org"><i class="fa fa-building"></i> ${escapeHtml(e.conductingBody)}</p>` : ''}
       <div class="card-details">
         ${e.testDate ? `<span><i class="fa fa-calendar-check"></i> Test: <span class="deadline-date">${formatDate(e.testDate)}</span></span>` : ''}
@@ -597,7 +624,7 @@ function cardExam(e) {
 
 function cardBook(b) {
   const fav = isFav(b.id, 'book');
-  const src = imgSrc(b.imageUrl, 'book');
+  const src = getCardImage(b, 'book');
   const imgHTML = src ? `<img src="${TRANSPARENT_PLACEHOLDER}" data-src="${escapeHtml(src)}" alt="${escapeHtml(b.title)}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : '';
   return `
   <div class="card" data-id="${b.id}" data-type="book" role="button" tabindex="0" aria-label="View ${escapeHtml(b.title)}">
@@ -614,6 +641,7 @@ function cardBook(b) {
         ${b.price ? `<span class="card-tag" style="background:#fef3c7;color:#92400e;border-color:#fcd34d">${escapeHtml(b.price)}</span>` : ''}
       </div>
       <h3 class="card-title">${escapeHtml(b.title)}</h3>
+      <p class="card-desc">${escapeHtml(cardExcerpt(b))}</p>
       <div class="card-details">
         ${b.author ? `<span><i class="fa fa-user"></i> ${escapeHtml(b.author)}</span>` : ''}
         ${b.edition ? `<span><i class="fa fa-book-open"></i> ${escapeHtml(b.edition)}</span>` : ''}
@@ -631,7 +659,7 @@ function cardBook(b) {
 
 function cardBlog(b) {
   const fav = isFav(b.id, 'blog');
-  const src = imgSrc(b.imageUrl||b.image_url, 'blog');
+  const src = getCardImage(b, 'blog');
   const imgHTML = src ? `<img src="${TRANSPARENT_PLACEHOLDER}" data-src="${escapeHtml(src)}" alt="${escapeHtml(b.title)}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : '';
   return `
   <div class="card" data-id="${b.id}" data-type="blog" role="button" tabindex="0" aria-label="Read ${escapeHtml(b.title)}">
@@ -647,7 +675,7 @@ function cardBlog(b) {
       </div>
       <h3 class="card-title">${escapeHtml(b.title)}</h3>
       ${b.author ? `<p class="card-org"><i class="fa fa-user"></i> ${escapeHtml(b.author)}</p>` : ''}
-      <p class="card-desc">${escapeHtml(b.shortDescription||b.short_description||b.description||'').slice(0,120)}</p>
+      <p class="card-desc">${escapeHtml(cardExcerpt(b))}</p>
       <div class="card-details">
         ${b.date ? `<span><i class="fa fa-calendar"></i> ${formatDate(b.date)}</span>` : ''}
       </div>
@@ -722,7 +750,7 @@ function openCardDetails(item, type) {
   const image = document.getElementById('cardDetailImage');
   const fallback = document.getElementById('cardDetailImageFallback');
   const title = text(item.title);
-  const src = imgSrc(item.imageUrl, type);
+  const src = getCardImage(item, type);
   document.getElementById('cardDetailType').textContent = (type || '').toUpperCase();
   document.getElementById('cardDetailTitle').textContent = title;
   document.getElementById('cardDetailSummary').textContent = text(item.description || item.details || 'Verified opportunity details are listed below.');
@@ -1173,6 +1201,11 @@ function initHomeCardSliders() {
         grid.scrollBy({ left: scrollStep(), behavior: 'smooth' });
       });
       grid.addEventListener('scroll', updateButtons, { passive: true });
+      grid.addEventListener('wheel', (event) => {
+        if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+        event.preventDefault();
+        grid.scrollBy({ left: event.deltaY, behavior: 'auto' });
+      }, { passive: false });
       window.addEventListener('resize', updateButtons);
       grid.dataset.sliderBound = 'true';
     }
