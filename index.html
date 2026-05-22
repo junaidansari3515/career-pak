@@ -157,20 +157,119 @@
 .view-all-link{font-size:.82rem;color:var(--primary,#0f766e);font-weight:700;text-decoration:none;display:flex;align-items:center;gap:.3rem;white-space:nowrap;flex-shrink:0;}
 .view-all-link:hover{text-decoration:underline;}
 
-/* ── Slider row ── */
-.slider-wrap{position:relative;}
+/* ── Slider system ── */
+.slider-wrap{position:relative;padding:0;}
+
+/* Core horizontal scroll rail */
 .slider-row{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
+  display:flex;
+  flex-wrap:nowrap;
   gap:1rem;
+  overflow-x:auto;
+  overflow-y:visible;
+  scroll-snap-type:x mandatory;
+  scroll-behavior:smooth;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior-x:contain;
+  padding-bottom:4px;        /* room for card shadow */
+  cursor:grab;
+  user-select:none;
+  -webkit-user-select:none;
 }
-.slider-row .card,.slider-row .exam-card{min-width:0;}
+.slider-row:active{cursor:grabbing;}
+/* Hide scrollbar on all; thin style on desktop */
+.slider-row{scrollbar-width:none;}
+.slider-row::-webkit-scrollbar{display:none;}
+@media(min-width:769px){
+  .slider-row{scrollbar-width:thin;scrollbar-color:var(--border,#e2e8f0) transparent;}
+  .slider-row::-webkit-scrollbar{display:block;height:5px;}
+  .slider-row::-webkit-scrollbar-track{background:transparent;}
+  .slider-row::-webkit-scrollbar-thumb{background:var(--border,#e2e8f0);border-radius:99px;}
+  .slider-row::-webkit-scrollbar-thumb:hover{background:var(--primary,#0f766e);}
+}
 
-/* Hidden extra cards — shown via JS */
-.slider-extra{display:none;}
-.slider-extra.revealed{display:contents;}
+/* Cards inside slider */
+.slider-row > .card,
+.slider-row > .exam-card,
+.slider-row > .skeleton-card{
+  flex:0 0 300px;
+  width:300px;
+  min-width:300px;
+  max-width:300px;
+  scroll-snap-align:start;
+  scroll-snap-stop:always;
+  height:auto;             /* equal height via align-items stretch */
+}
+/* Skeleton placeholder sizing */
+.slider-row > .skeleton-card{height:340px;}
 
-/* Show-more button */
+/* Mobile: 84vw wide cards */
+@media(max-width:768px){
+  .slider-row > .card,
+  .slider-row > .exam-card,
+  .slider-row > .skeleton-card{
+    flex:0 0 84vw;
+    width:84vw;
+    min-width:84vw;
+    max-width:84vw;
+  }
+  .slider-row > .skeleton-card{height:300px;}
+}
+/* Tablet */
+@media(min-width:769px) and (max-width:1100px){
+  .slider-row > .card,
+  .slider-row > .exam-card,
+  .slider-row > .skeleton-card{
+    flex:0 0 280px;
+    width:280px;
+    min-width:280px;
+    max-width:280px;
+  }
+}
+
+/* Equal-height row */
+.slider-row{align-items:stretch;}
+
+/* ── Slider arrow buttons ── */
+.slider-arrow{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  z-index:10;
+  width:38px;height:38px;
+  border-radius:50%;
+  border:1px solid var(--border,#e2e8f0);
+  background:var(--bg-card,#fff);
+  color:var(--text-main,#1e293b);
+  font-size:.85rem;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 12px rgba(15,23,42,.1);
+  transition:all .2s ease;
+  flex-shrink:0;
+}
+.slider-arrow:hover{
+  border-color:var(--primary,#0f766e);
+  color:var(--primary,#0f766e);
+  background:var(--bg-card,#fff);
+  box-shadow:0 4px 18px rgba(15,118,110,.18);
+  transform:translateY(-50%) scale(1.08);
+}
+.slider-arrow:disabled{
+  opacity:.32;
+  cursor:default;
+  pointer-events:none;
+  transform:translateY(-50%) scale(1);
+  box-shadow:none;
+}
+.slider-arrow-prev{left:-18px;}
+.slider-arrow-next{right:-18px;}
+/* Hide arrows on mobile — touch swipe handles it */
+@media(max-width:768px){.slider-arrow{display:none;}}
+body.dark .slider-arrow{background:#1e293b;border-color:#374151;color:#e2e8f0;}
+body.dark .slider-arrow:hover{border-color:rgba(91,155,255,.5);color:#93c5fd;}
+
+/* ── Show-more button ── */
 .show-more-btn{
   display:block;width:100%;margin-top:.85rem;
   padding:.58rem 1rem;border:1.5px dashed var(--border,#e2e8f0);
@@ -180,7 +279,10 @@
 }
 .show-more-btn:hover{border-color:var(--primary,#0f766e);color:var(--primary,#0f766e);background:rgba(15,118,110,.04);}
 .show-more-btn i{margin-left:.35rem;transition:transform .2s;}
-.show-more-btn.open i{transform:rotate(180deg);}
+.show-more-btn.expanded i{transform:rotate(180deg);}
+
+/* Extra cards container — hidden until show-more fires */
+.slider-extra{display:none;}
 
 /* ── Home section block ── */
 .home-block{margin-bottom:2.75rem;}
@@ -256,10 +358,6 @@
 @media(max-width:768px){
   .ai-panel{width:min(90vw,340px);right:12px;bottom:132px;max-height:min(65vh,460px);}
   .ai-fab{right:12px;bottom:78px;}
-  .slider-row{grid-template-columns:1fr;}
-}
-@media(min-width:769px) and (max-width:1100px){
-  .slider-row{grid-template-columns:repeat(2,1fr);}
 }
   </style>
 </head>
@@ -412,11 +510,11 @@
             </div>
             <a href="scholarships.html" class="view-all-link">View All <i class="fa fa-arrow-right fa-xs"></i></a>
           </div>
-          <div class="slider-row" id="grid-scholarships">
+          <div class="slider-wrap" id="wrap-scholarships"><div class="slider-row" id="grid-scholarships">
             <div class="skeleton-card"></div>
             <div class="skeleton-card"></div>
             <div class="skeleton-card"></div>
-          </div>
+          </div></div><!-- /slider-wrap -->
           <div class="slider-extra" id="extra-scholarships"></div>
           <button class="show-more-btn" id="more-scholarships" onclick="toggleExtra('scholarships',this)" style="display:none">
             Show More <i class="fa fa-chevron-down"></i>
@@ -433,11 +531,11 @@
             </div>
             <a href="jobs.html" class="view-all-link">View All <i class="fa fa-arrow-right fa-xs"></i></a>
           </div>
-          <div class="slider-row" id="grid-jobs">
+          <div class="slider-wrap" id="wrap-jobs"><div class="slider-row" id="grid-jobs">
             <div class="skeleton-card"></div>
             <div class="skeleton-card"></div>
             <div class="skeleton-card"></div>
-          </div>
+          </div></div><!-- /slider-wrap -->
           <div class="slider-extra" id="extra-jobs"></div>
           <button class="show-more-btn" id="more-jobs" onclick="toggleExtra('jobs',this)" style="display:none">
             Show More <i class="fa fa-chevron-down"></i>
@@ -454,11 +552,11 @@
             </div>
             <a href="internships.html" class="view-all-link">View All <i class="fa fa-arrow-right fa-xs"></i></a>
           </div>
-          <div class="slider-row" id="grid-internships">
+          <div class="slider-wrap" id="wrap-internships"><div class="slider-row" id="grid-internships">
             <div class="skeleton-card"></div>
             <div class="skeleton-card"></div>
             <div class="skeleton-card"></div>
-          </div>
+          </div></div><!-- /slider-wrap -->
           <div class="slider-extra" id="extra-internships"></div>
           <button class="show-more-btn" id="more-internships" onclick="toggleExtra('internships',this)" style="display:none">
             Show More <i class="fa fa-chevron-down"></i>
@@ -475,11 +573,11 @@
             </div>
             <a href="exams.html" class="view-all-link">View All <i class="fa fa-arrow-right fa-xs"></i></a>
           </div>
-          <div class="slider-row" id="grid-exams">
+          <div class="slider-wrap" id="wrap-exams"><div class="slider-row" id="grid-exams">
             <div class="skeleton-card"></div>
             <div class="skeleton-card"></div>
             <div class="skeleton-card"></div>
-          </div>
+          </div></div><!-- /slider-wrap -->
           <div class="slider-extra" id="extra-exams"></div>
           <button class="show-more-btn" id="more-exams" onclick="toggleExtra('exams',this)" style="display:none">
             Show More <i class="fa fa-chevron-down"></i>
@@ -496,11 +594,11 @@
             </div>
             <a href="books.html" class="view-all-link">View All <i class="fa fa-arrow-right fa-xs"></i></a>
           </div>
-          <div class="slider-row" id="grid-books">
+          <div class="slider-wrap" id="wrap-books"><div class="slider-row" id="grid-books">
             <div class="skeleton-card"></div>
             <div class="skeleton-card"></div>
             <div class="skeleton-card"></div>
-          </div>
+          </div></div><!-- /slider-wrap -->
           <div class="slider-extra" id="extra-books"></div>
           <button class="show-more-btn" id="more-books" onclick="toggleExtra('books',this)" style="display:none">
             Show More <i class="fa fa-chevron-down"></i>
@@ -517,11 +615,11 @@
             </div>
             <a href="blog.html" class="view-all-link">View All <i class="fa fa-arrow-right fa-xs"></i></a>
           </div>
-          <div class="slider-row" id="grid-blogs">
+          <div class="slider-wrap" id="wrap-blogs"><div class="slider-row" id="grid-blogs">
             <div class="skeleton-card"></div>
             <div class="skeleton-card"></div>
             <div class="skeleton-card"></div>
-          </div>
+          </div></div><!-- /slider-wrap -->
           <div class="slider-extra" id="extra-blogs"></div>
           <button class="show-more-btn" id="more-blogs" onclick="toggleExtra('blogs',this)" style="display:none">
             Show More <i class="fa fa-chevron-down"></i>
@@ -729,6 +827,8 @@ document.addEventListener('DOMContentLoaded', () => {
   if (typeof registerMultiTabRefresh === 'function') registerMultiTabRefresh(_homeInit);
   if (typeof initializeAutoRefreshListeners === 'function') initializeAutoRefreshListeners();
   _initNavbarScroll();
+  // Init slider arrows as soon as DOM is ready (skeletons already in rail)
+  if (typeof initSliders === 'function') initSliders();
 });
 
 function _initNavbarScroll() {
@@ -839,6 +939,9 @@ function _homeInit() {
         </a>`).join('') : '<p class="sw-empty">No posts yet.</p>';
     }
 
+    // ── Init sliders for all sections after render
+    if (typeof initSliders === 'function') setTimeout(initSliders, 60);
+
     // ── Notification bar from Notifications sheet
     const activeN = N.filter(n => n.isActive !== false && (n.message || n.title));
     const bar = document.getElementById('notifBar');
@@ -856,6 +959,109 @@ function _homeInit() {
   } catch(err) { console.error('[CareerPK Home]', err); }
 }
 
+
+// ── Slider initialisation ─────────────────────────────────
+// Call with a specific wrapper ID to refresh just one section,
+// or with no argument to init all .slider-wrap elements on the page.
+function initSliders(wrapId) {
+  const wraps = wrapId
+    ? [document.getElementById(wrapId)].filter(Boolean)
+    : Array.from(document.querySelectorAll('.slider-wrap'));
+
+  wraps.forEach(function(wrap) {
+    const rail = wrap.querySelector('.slider-row');
+    if (!rail) return;
+
+    // ── Arrow buttons (create once, skip if already exist) ──
+    let prevBtn = wrap.querySelector('.slider-arrow-prev');
+    let nextBtn = wrap.querySelector('.slider-arrow-next');
+
+    if (!prevBtn) {
+      prevBtn = document.createElement('button');
+      prevBtn.type = 'button';
+      prevBtn.className = 'slider-arrow slider-arrow-prev';
+      prevBtn.setAttribute('aria-label', 'Scroll left');
+      prevBtn.innerHTML = '<i class="fa fa-chevron-left" aria-hidden="true"></i>';
+      wrap.insertBefore(prevBtn, rail);
+    }
+    if (!nextBtn) {
+      nextBtn = document.createElement('button');
+      nextBtn.type = 'button';
+      nextBtn.className = 'slider-arrow slider-arrow-next';
+      nextBtn.setAttribute('aria-label', 'Scroll right');
+      nextBtn.innerHTML = '<i class="fa fa-chevron-right" aria-hidden="true"></i>';
+      wrap.appendChild(nextBtn);
+    }
+
+    // Card width + gap (CSS: 300px card, 1rem/16px gap)
+    function _stepWidth() {
+      const card = rail.querySelector('.card,.exam-card,.skeleton-card');
+      const gap  = parseFloat(getComputedStyle(rail).gap) || 16;
+      return card ? card.offsetWidth + gap : 316;
+    }
+
+    // Scroll by one card
+    prevBtn.onclick = function() {
+      rail.scrollBy({ left: -_stepWidth(), behavior: 'smooth' });
+    };
+    nextBtn.onclick = function() {
+      rail.scrollBy({ left: _stepWidth(), behavior: 'smooth' });
+    };
+
+    // Update arrow visibility
+    function _updateArrows() {
+      const atStart = rail.scrollLeft <= 2;
+      const atEnd   = rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 2;
+      prevBtn.disabled = atStart;
+      nextBtn.disabled = atEnd;
+      // Hide next arrow completely if all cards fit without scrolling
+      const noOverflow = rail.scrollWidth <= rail.clientWidth + 4;
+      nextBtn.style.display = noOverflow ? 'none' : '';
+      prevBtn.style.display = noOverflow ? 'none' : '';
+    }
+
+    // Listen for scroll changes
+    if (!rail._arrowListenerBound) {
+      rail._arrowListenerBound = true;
+      rail.addEventListener('scroll', _updateArrows, { passive: true });
+      // Re-check after images load / layout reflows
+      new ResizeObserver(_updateArrows).observe(rail);
+    }
+
+    // ── Mouse-drag scroll ──
+    if (!rail._dragBound) {
+      rail._dragBound = true;
+      var isDragging = false, startX, startScroll;
+
+      rail.addEventListener('mousedown', function(e) {
+        isDragging = true;
+        startX      = e.clientX;
+        startScroll = rail.scrollLeft;
+        rail.style.cursor = 'grabbing';
+        e.preventDefault();
+      });
+      document.addEventListener('mousemove', function(e) {
+        if (!isDragging) return;
+        var dx = startX - e.clientX;
+        rail.scrollLeft = startScroll + dx;
+      });
+      document.addEventListener('mouseup', function() {
+        if (isDragging) {
+          isDragging = false;
+          rail.style.cursor = 'grab';
+        }
+      });
+      // Prevent card click firing after a drag
+      rail.addEventListener('click', function(e) {
+        if (Math.abs(rail.scrollLeft - startScroll) > 4) e.stopPropagation();
+      }, true);
+    }
+
+    // Initial state
+    _updateArrows();
+  });
+}
+
 // ── Section renderer ──────────────────────────────────────
 function _renderSection(key, items, renderer) {
   const grid    = document.getElementById('grid-' + key);
@@ -866,7 +1072,7 @@ function _renderSection(key, items, renderer) {
   if (!grid) return;
 
   if (!items || items.length === 0) {
-    grid.innerHTML = `<p style="color:var(--text-muted);font-size:.9rem;grid-column:1/-1">No ${key} available yet.</p>`;
+    grid.innerHTML = '<p style="color:var(--text-muted);font-size:.9rem;padding:.75rem 0">No ' + key + ' available yet.</p>';
     if (moreBtn) moreBtn.style.display = 'none';
     if (cntEl)   cntEl.textContent = '0';
     return;
@@ -875,71 +1081,85 @@ function _renderSection(key, items, renderer) {
   // Count badge
   if (cntEl) cntEl.textContent = items.length + (items.length > 1 ? ' total' : '');
 
-  // First 3 go into main grid
-  const first  = items.slice(0, VISIBLE_INIT);
-  const rest   = items.slice(VISIBLE_INIT);
+  // First VISIBLE_INIT cards go into the scroll rail
+  const first = items.slice(0, VISIBLE_INIT);
+  const rest  = items.slice(VISIBLE_INIT);
 
   grid.innerHTML = first.map(renderer).join('');
   _activateCards(grid);
 
-  // Store state
+  // Lazy-load images in the newly rendered cards
+  if (typeof window.initLazyImages === 'function') window.initLazyImages(grid);
+
+  // Store state for progressive loading
   _sectionState[key] = { items, shown: VISIBLE_INIT, renderer };
 
-  // Pre-render next batch into hidden extra container
+  // Pre-buffer next batch into hidden extra container
   if (rest.length > 0 && extra) {
     extra.innerHTML = rest.slice(0, BATCH_SIZE).map(renderer).join('');
     _activateCards(extra);
+    if (typeof window.initLazyImages === 'function') window.initLazyImages(extra);
     if (moreBtn) {
       moreBtn.style.display = '';
       moreBtn.dataset.nextStart = VISIBLE_INIT + BATCH_SIZE;
-      moreBtn.textContent = '';
-      moreBtn.innerHTML = `Show More (${Math.min(rest.length, BATCH_SIZE)} of ${rest.length} more) <i class="fa fa-chevron-down"></i>`;
+      moreBtn.innerHTML = 'Show More (' + Math.min(rest.length, BATCH_SIZE) + ' of ' + rest.length + ' more) <i class="fa fa-chevron-down"></i>';
     }
   }
+
+  // Re-init slider arrows for this section (cards just changed)
+  if (typeof initSliders === 'function') initSliders('wrap-' + key);
 }
 
-// ── Show More toggle ──────────────────────────────────────
+// ── Show More — appends cards into slider rail, scroll to reveal ──
 function toggleExtra(key, btn) {
   const extra = document.getElementById('extra-' + key);
   const grid  = document.getElementById('grid-' + key);
-  if (!extra) return;
+  if (!extra || !grid) return;
 
   const state = _sectionState[key];
-  const isOpen = extra.classList.contains('revealed');
+  if (!state) return;
 
-  if (!isOpen) {
-    // Expand: show next batch inside extra, then move into grid
-    extra.classList.add('revealed');
+  // Mark how many cards exist before insertion (for scroll target)
+  const cardsBefore = grid.querySelectorAll('.card,.exam-card').length;
 
-    // Load next batch if needed
-    const nextStart = parseInt(btn.dataset.nextStart || (state.shown + BATCH_SIZE));
-    const nextItems = state.items.slice(nextStart, nextStart + BATCH_SIZE);
-    if (nextItems.length > 0) {
-      grid.insertAdjacentHTML('beforeend', extra.innerHTML);
-      extra.innerHTML = nextItems.map(state.renderer).join('');
-      _activateCards(extra);
-      state.shown = nextStart;
-      btn.dataset.nextStart = nextStart + BATCH_SIZE;
-    } else {
-      // No more — move extra into grid and hide button
-      grid.insertAdjacentHTML('beforeend', extra.innerHTML);
-      extra.innerHTML = '';
-      _activateCards(grid);
-    }
-
-    const totalLeft = state.items.length - state.shown - BATCH_SIZE;
-    if (totalLeft <= 0) {
-      btn.style.display = 'none';
-    } else {
-      btn.innerHTML = `Show More (${Math.min(totalLeft, BATCH_SIZE)} of ${totalLeft} more) <i class="fa fa-chevron-down"></i>`;
-    }
-    _activateCards(grid);
-  } else {
-    // Already revealed, just collapse
-    extra.classList.remove('revealed');
-    btn.classList.remove('open');
-    btn.innerHTML = `Show More <i class="fa fa-chevron-down"></i>`;
+  // Move buffered extra cards into the slider rail
+  if (extra.innerHTML.trim()) {
+    grid.insertAdjacentHTML('beforeend', extra.innerHTML);
+    extra.innerHTML = '';
   }
+
+  _activateCards(grid);
+  if (typeof window.initLazyImages === 'function') window.initLazyImages(grid);
+
+  // Scroll slider to the first newly added card
+  const allCards = grid.querySelectorAll('.card,.exam-card');
+  const newCard  = allCards[cardsBefore];
+  if (newCard) {
+    requestAnimationFrame(() => {
+      newCard.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+    });
+  }
+
+  // Update state and button
+  const nextStart = parseInt(btn.dataset.nextStart || (state.shown + BATCH_SIZE));
+  state.shown = nextStart;
+
+  const nextItems = state.items.slice(nextStart, nextStart + BATCH_SIZE);
+  if (nextItems.length > 0) {
+    // Buffer next batch silently
+    extra.innerHTML = nextItems.map(state.renderer).join('');
+    _activateCards(extra);
+    if (typeof window.initLazyImages === 'function') window.initLazyImages(extra);
+    btn.dataset.nextStart = nextStart + BATCH_SIZE;
+    const totalLeft = state.items.length - nextStart;
+    btn.innerHTML = 'Show More (' + Math.min(totalLeft, BATCH_SIZE) + ' of ' + totalLeft + ' more) <i class="fa fa-chevron-down"></i>';
+    btn.classList.add('expanded');
+  } else {
+    btn.style.display = 'none';
+  }
+
+  // Re-init slider arrows since card count changed
+  if (typeof initSliders === 'function') initSliders('wrap-' + key);
 }
 
 // ── Helpers ───────────────────────────────────────────────
