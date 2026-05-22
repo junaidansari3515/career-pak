@@ -179,11 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if(typeof initDarkMode==='function') initDarkMode();
   if(typeof updateFavCount==='function') updateFavCount();
   if(typeof initMenu==='function') initMenu();
-  onCMSReady(() => {
-    loadPost();
-    _fillSubSidebar();
-  });
-});
+  waitForCMSData(['Blogs']).then(() => {
 
 function loadPost() {
   const id = new URLSearchParams(location.search).get('id');

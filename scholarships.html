@@ -298,7 +298,7 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       updateFavCount();
-      onCMSReady(() => {
+      waitForCMSData(['Scholarships']).then(() => {
         loadData();
         updateFavCount();
       });

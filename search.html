@@ -155,7 +155,7 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       updateFavCount();
-      onCMSReady(() => {
+      waitForCMSData(['Jobs','Scholarships','Internships','Exams','Books']).then(() => {
         updateFavCount();
         if (query) {
           document.getElementById('searchInput').value = query;

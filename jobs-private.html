@@ -12,6 +12,7 @@
   <script src="js/analytics-loader.js" defer></script>
 
   <script src="js/cms-bootstrap.js"></script>
+  <script src="js/google-sheet-loader.js" defer></script>
   <link rel="stylesheet" href="css/main-enhanced.css"/>
   <link rel="stylesheet" href="css/perf-improvements.css"/>
   <link rel="stylesheet" href="css/premium-upgrades.css"/>
@@ -62,7 +63,7 @@
   </div>
 </footer>
   <script src="js/app.js" defer></script>
-  <script>function _renderPage(){let items=(window.CMS_DATA.Jobs||[]).slice();if('jobs-private'==='jobs-government')items=items.filter(i=>isGovernmentType(i.type)||/government/i.test(i.category||''));if('jobs-private'==='jobs-private')items=items.filter(i=>!isGovernmentType(i.type));items=sortItems(items,'newest');const rc=document.getElementById('resultsCount');if(rc)rc.textContent=items.length+' results';if(typeof renderCards==='function'){renderCards(items,'resultsGrid','job');}}document.addEventListener('DOMContentLoaded',()=>onCMSReady(()=>{const run=()=>{if(typeof window.sortItems!=='function'||typeof window.renderCards!=='function'){setTimeout(run,120);return;} _renderPage();};run();}));</script>
+  <script>function _renderPage(){let items=(window.CMS_DATA.Jobs||[]).slice();if('jobs-private'==='jobs-government')items=items.filter(i=>isGovernmentType(i.type)||/government/i.test(i.category||''));if('jobs-private'==='jobs-private')items=items.filter(i=>!isGovernmentType(i.type));items=sortItems(items,'newest');const rc=document.getElementById('resultsCount');if(rc)rc.textContent=items.length+' results';if(typeof renderCards==='function'){renderCards(items,'resultsGrid','job');}}document.addEventListener('DOMContentLoaded',()=>{waitForCMSData(['Jobs']).then(()=>{const run=()=>{if(typeof window.sortItems!=='function'||typeof window.renderCards!=='function'){setTimeout(run,120);return;} _renderPage();};run();});});</script>
 
 <script src="js/ai-chatbot-global.js" defer></script>
 </body>

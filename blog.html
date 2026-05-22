@@ -163,15 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initDarkMode();
   updateFavCount();
   initMenu();
-  // Wait for CMS with 8s fallback
-  Promise.race([
-    new Promise(resolve => {
-      if (window._CMS_READY && window.CMS_DATA && (window.CMS_DATA.Blogs||[]).length) return resolve();
-      onCMSReady(resolve);
-      document.addEventListener('cmsReady', resolve, { once: true });
-    }),
-    new Promise(resolve => setTimeout(resolve, 8000))
-  ]).then(loadBlogData);
+  waitForCMSData(['Blogs'], { timeout: 8000 }).then(loadBlogData);
   if (typeof initializeAutoRefreshListeners === 'function') initializeAutoRefreshListeners();
 });
 

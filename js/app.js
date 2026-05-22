@@ -14,12 +14,18 @@ window.CMS_DATA = window.CMS_DATA || { Scholarships: [], Jobs: [], Internships: 
 function fetchSheet(sheetName) {
   return Promise.resolve((window.CMS_DATA[sheetName] || []).slice());
 }
-function whenCMSReady(fn) {
+function whenCMSReady(fn, requiredSheets) {
+  if (typeof window.waitForCMSData === 'function') {
+    window.waitForCMSData(requiredSheets || []).then(function () {
+      try { fn(window.CMS_DATA || {}); } catch (e) { console.error('[CMS] whenCMSReady callback error:', e); }
+    });
+    return;
+  }
   if (typeof window.onCMSReady === 'function') {
     window.onCMSReady(fn);
     return;
   }
-  fn(window.CMS_DATA || {});
+  try { fn(window.CMS_DATA || {}); } catch (e) { console.error('[CMS] whenCMSReady callback error:', e); }
 }
 function text(value) {
   return String(value ?? '');

@@ -57,6 +57,86 @@
 
   window.registerMultiTabRefresh = function (cb) { window.onCMSRefresh(cb); };
 
+  window._CMS_LOADER_PROMISE = window._CMS_LOADER_PROMISE || null;
+  window._CMS_SHEETS_LOADED = window._CMS_SHEETS_LOADED || {};
+
+  window._ensureCmsLoader = function () {
+    if (typeof window.loadAllSheets === 'function') return Promise.resolve();
+    if (window._CMS_LOADER_PROMISE) return window._CMS_LOADER_PROMISE;
+
+    var existing = document.querySelector('script[src*="google-sheet-loader.js"]');
+    if (existing) {
+      window._CMS_LOADER_PROMISE = new Promise(function (resolve, reject) {
+        if (typeof window.loadAllSheets === 'function') return resolve();
+        existing.addEventListener('load', function () { resolve(); }, { once: true });
+        existing.addEventListener('error', function (evt) { console.error('[CMS] google-sheet-loader.js failed to load', evt); reject(evt); }, { once: true });
+      });
+      return window._CMS_LOADER_PROMISE;
+    }
+
+    window._CMS_LOADER_PROMISE = new Promise(function (resolve, reject) {
+      var script = document.createElement('script');
+      script.src = 'js/google-sheet-loader.js';
+      script.defer = true;
+      script.onload = function () { resolve(); };
+      script.onerror = function (evt) { console.error('[CMS] Failed to load google-sheet-loader.js', evt); reject(evt); };
+      (document.head || document.documentElement).appendChild(script);
+    });
+    return window._CMS_LOADER_PROMISE;
+  };
+
+  window.waitForCMSData = function (requiredSheets, options) {
+    options = Object.assign({ timeout: 8000, interval: 120 }, options || {});
+    var sheets = [];
+    if (Array.isArray(requiredSheets)) sheets = requiredSheets.slice();
+    else if (typeof requiredSheets === 'string') sheets = [requiredSheets];
+    sheets = sheets.map(function (s) { return String(s || '').trim(); }).filter(Boolean);
+
+    var hasSheet = function (name) {
+      if (!window.CMS_DATA) return false;
+      if (window._CMS_READY) {
+        if (Array.isArray(window.CMS_DATA[name])) return true;
+        var key = String(name || '').toLowerCase();
+        return Array.isArray(window.CMS_DATA[key]);
+      }
+      if (Array.isArray(window.CMS_DATA[name]) && window._CMS_SHEETS_LOADED[name]) return true;
+      var key = String(name || '').toLowerCase();
+      return Array.isArray(window.CMS_DATA[key]) && window._CMS_SHEETS_LOADED[key];
+    };
+
+    var ready = function () {
+      if (sheets.length === 0) {
+        return window._CMS_READY || (window.CMS_DATA && Object.keys(window.CMS_DATA).some(function (key) { return Array.isArray(window.CMS_DATA[key]); }));
+      }
+      return sheets.every(hasSheet);
+    };
+
+    return window._ensureCmsLoader().catch(function (err) {
+      console.warn('[CMS] No loader available, continuing with existing CMS_DATA', err);
+    }).then(function () {
+      if (ready()) return window.CMS_DATA || {};
+      return new Promise(function (resolve) {
+        var start = Date.now();
+        var check = function () {
+          if (ready()) {
+            resolve(window.CMS_DATA || {});
+            return;
+          }
+          if (Date.now() - start >= options.timeout) {
+            console.warn('[CMS] waitForCMSData timeout for sheets:', sheets.join(', '), 'available:', Object.keys(window.CMS_DATA || {}).filter(function (key) { return Array.isArray(window.CMS_DATA[key]); }).join(', '));
+            document.dispatchEvent(new CustomEvent('cmsLoadFailed', {
+              detail: { requiredSheets: sheets, availableSheets: Object.keys(window.CMS_DATA || {}).filter(function (key) { return Array.isArray(window.CMS_DATA[key]); }) }
+            }));
+            resolve(window.CMS_DATA || {});
+            return;
+          }
+          setTimeout(check, options.interval);
+        };
+        check();
+      });
+    });
+  };
+
   // ── BUG FIX #4: Apply dark mode instantly (no flash) ────────
   // Step 1: add style rule immediately so body starts dark before paint
   if (localStorage.getItem('ch_dark') === 'true') {

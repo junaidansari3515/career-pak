@@ -227,25 +227,50 @@ async function loadOneSheet(cfg){
   }
 }
 
-async function loadAllSheets(){
-  if(window.CMS_LOADING.global)return window.CMS_DATA;
-  window.CMS_LOADING.global=true;
-  const results=await Promise.allSettled(SHEETS_CONFIG.map(loadOneSheet));
-  results.forEach((r,i)=>{
-    const cfg=SHEETS_CONFIG[i];
-    const data=r.status==='fulfilled'?r.value:[];
-    if(r.status==='rejected')console.warn(`[CMS] Failed ${cfg.name}:`,r.reason?.message||r.reason);
-    window.CMS_DATA[cfg.name]=data;
-    window.CMS_DATA[cfg.name.toLowerCase()]=data;
-  });
-  window.CMS_LOADING.global=false;
-  if(typeof window._fireCMSReady==='function')window._fireCMSReady();
-  return window.CMS_DATA;
+function _assignSheetData(name, data) {
+  window.CMS_DATA[name] = data;
+  window.CMS_DATA[name.toLowerCase()] = data;
+  window._CMS_SHEETS_LOADED = window._CMS_SHEETS_LOADED || {};
+  window._CMS_SHEETS_LOADED[name] = true;
+  window._CMS_SHEETS_LOADED[name.toLowerCase()] = true;
+  if (typeof window._fireCMSSheetReady === 'function') window._fireCMSSheetReady(name, data);
+  document.dispatchEvent(new CustomEvent('cmsSheetReady', { detail: { sheet: name, data: data } }));
 }
 
-window.loadAllSheets=loadAllSheets;
-window.onCMSReady=window.onCMSReady||function(fn){
-  if(typeof fn!=='function')return;
-  loadAllSheets().then(()=>fn(window.CMS_DATA)).catch(()=>fn(window.CMS_DATA));
+async function loadAllSheets() {
+  if (window._CMS_LOAD_PROMISE) return window._CMS_LOAD_PROMISE;
+  window.CMS_LOADING.global = true;
+
+  const tasks = SHEETS_CONFIG.map((cfg) => {
+    return loadOneSheet(cfg)
+      .then((data) => {
+        _assignSheetData(cfg.name, data);
+        return data;
+      })
+      .catch((err) => {
+        console.warn(`[CMS] Failed ${cfg.name}:`, err?.message || err);
+        _assignSheetData(cfg.name, []);
+        return [];
+      });
+  });
+
+  window._CMS_LOAD_PROMISE = Promise.all(tasks).then(() => {
+    window.CMS_LOADING.global = false;
+    if (typeof window._fireCMSReady === 'function') window._fireCMSReady();
+    return window.CMS_DATA;
+  }).catch((err) => {
+    window.CMS_LOADING.global = false;
+    if (typeof window._fireCMSReady === 'function') window._fireCMSReady();
+    console.warn('[CMS] loadAllSheets encountered an error:', err);
+    return window.CMS_DATA;
+  });
+
+  return window._CMS_LOAD_PROMISE;
+}
+
+window.loadAllSheets = loadAllSheets;
+window.onCMSReady = window.onCMSReady || function (fn) {
+  if (typeof fn !== 'function') return;
+  loadAllSheets().then(() => fn(window.CMS_DATA)).catch(() => fn(window.CMS_DATA));
 };
 loadAllSheets();

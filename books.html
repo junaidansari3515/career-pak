@@ -205,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initDarkMode();
   updateFavCount();
   initMenu();
-  onCMSReady(() => { loadData(); updateFavCount(); });
+  waitForCMSData(['Books']).then(() => { loadData(); updateFavCount(); });
   if (typeof registerAutoRefreshSection === 'function') registerAutoRefreshSection('Books', loadData);
   if (typeof initializeAutoRefreshListeners === 'function') initializeAutoRefreshListeners();
 });

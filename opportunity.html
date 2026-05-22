@@ -303,12 +303,23 @@ document.addEventListener('DOMContentLoaded', () => {
   initDarkMode();
   updateFavCount();
   initMenu();
-  onCMSReady(loadOpportunity);
+  waitForCMSData(getOpportunityRequiredSheets()).then(loadOpportunity);
 });
 
 function getUrlParams() {
   const p = new URLSearchParams(window.location.search);
   return { type: p.get('type') || '', id: p.get('id') || '' };
+}
+
+function getOpportunityRequiredSheets() {
+  const type = getUrlParams().type;
+  if (type === 'job') return ['Jobs'];
+  if (type === 'scholarship') return ['Scholarships'];
+  if (type === 'internship') return ['Internships'];
+  if (type === 'exam') return ['Exams'];
+  if (type === 'book') return ['Books'];
+  if (type === 'blog') return ['Blogs'];
+  return ['Jobs', 'Scholarships', 'Internships', 'Exams', 'Books', 'Blogs'];
 }
 
 function loadOpportunity() {
