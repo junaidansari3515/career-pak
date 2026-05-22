@@ -14,6 +14,125 @@ window.CMS_DATA = window.CMS_DATA || { Scholarships: [], Jobs: [], Internships: 
 function fetchSheet(sheetName) {
   return Promise.resolve((window.CMS_DATA[sheetName] || []).slice());
 }
+// ── Sidebar rendering: populate per-section contextual sidebars ──
+function renderSectionSidebars() {
+  const D = window.CMS_DATA || {};
+  
+  // Scholarships sidebar
+  try {
+    const s = D.Scholarships || [];
+    const nearDeadlines = (s || []).filter(i => i.deadline).map(i => ({...i, _d:new Date(i.deadline)})).filter(i => i._d > new Date()).sort((a,b)=>a._d-b._d).slice(0,4);
+    const fullyFunded = (s || []).filter(i => (i.funding||'').toLowerCase().includes('full')) .slice(0,4);
+    const degrees = [...new Set((s||[]).map(i=> (i.level||'').trim()).filter(Boolean))].slice(0,6);
+    const countries = [...new Set((s||[]).map(i=> (i.country||i.location||'').trim()).filter(Boolean))].slice(0,6);
+    const sb = document.getElementById('sidebar-scholarships');
+    if (sb) {
+      sb.innerHTML = `
+        <div class="mini-list">
+          <div><strong>Closing Soon</strong></div>
+          ${nearDeadlines.map(i=>`<a class="mini-item" href="${getCardDetailsUrl(i.id,'scholarship',i.title)}"><div class="mini-icon">🎓</div><div><div style="font-weight:700">${escapeHtml(i.title||'')}</div><div style="font-size:.82rem;color:var(--text-muted)">${formatDate(i.deadline)}</div></div></a>`).join('')}
+        </div>
+        <div style="margin-top:10px"><strong>Fully funded</strong>
+          <div class="mini-list" style="margin-top:8px">${fullyFunded.map(i=>`<a class="mini-item" href="${getCardDetailsUrl(i.id,'scholarship',i.title)}"><div class="mini-icon">💰</div><div><div style="font-weight:700">${escapeHtml(i.title||'')}</div></div></a>`).join('')}</div>
+        </div>
+        <div style="margin-top:10px"><strong>Degrees</strong><div class="chip-row" style="margin-top:8px">${degrees.map(d=>`<button class="chip" onclick="filterTo('scholarships','level','${escapeJsSingleQuote(d)}')">${escapeHtml(d)}</button>`).join('')}</div></div>
+        <div style="margin-top:10px"><strong>Countries</strong><div class="chip-row" style="margin-top:8px">${countries.map(c=>`<button class="chip" onclick="filterTo('scholarships','country','${escapeJsSingleQuote(c)}')">${escapeHtml(c)}</button>`).join('')}</div></div>
+        <div style="margin-top:10px"><a href="scholarships.html">View all scholarships →</a></div>
+      `;
+    }
+  } catch(e){console.error('sidebar scholarships',e)}
+
+  // Jobs sidebar
+  try {
+    const j = D.Jobs || [];
+    const gov = j.filter(i=> isGovernmentType(i.type||i.organization||'')).slice(0,4);
+    const remote = j.filter(i=> (i.location||'').toLowerCase().includes('remote')).slice(0,4);
+    const urgent = j.filter(i=> { const d = new Date(i.deadline||i.closing||i.closingDate||''), now=new Date(); return d && (d - now) / 86400000 <= 7 && d>now; }).slice(0,4);
+    const sb = document.getElementById('sidebar-jobs');
+    if (sb) {
+      sb.innerHTML = `
+        <div><strong>Government Jobs</strong><div class="mini-list" style="margin-top:8px">${gov.map(i=>`<a class="mini-item" href="${getCardDetailsUrl(i.id,'job',i.title)}"><div class="mini-icon">🏛️</div><div><div style="font-weight:700">${escapeHtml(i.title||'')}</div><div style="font-size:.82rem;color:var(--text-muted)">${escapeHtml(i.organization||i.type||'')}</div></div></a>`).join('')}</div></div>
+        <div style="margin-top:10px"><strong>Remote</strong><div class="mini-list" style="margin-top:8px">${remote.map(i=>`<a class="mini-item" href="${getCardDetailsUrl(i.id,'job',i.title)}"><div class="mini-icon">🏠</div><div><div style="font-weight:700">${escapeHtml(i.title||'')}</div></div></a>`).join('')}</div></div>
+        <div style="margin-top:10px"><strong>Urgent hiring</strong><div class="mini-list" style="margin-top:8px">${urgent.map(i=>`<a class="mini-item" href="${getCardDetailsUrl(i.id,'job',i.title)}"><div class="mini-icon">⚡</div><div><div style="font-weight:700">${escapeHtml(i.title||'')}</div><div style="font-size:.82rem;color:var(--text-muted)">${formatDate(i.deadline||i.closing||'')}</div></div></a>`).join('')}</div></div>
+        <div style="margin-top:10px"><a href="jobs.html">View all jobs →</a></div>
+      `;
+    }
+  } catch(e){console.error('sidebar jobs',e)}
+
+  // Internships sidebar
+  try {
+    const I = D.Internships || [];
+    const paid = I.filter(i=> (i.type||'').toLowerCase().includes('paid')).slice(0,4);
+    const remoteI = I.filter(i=> (i.location||'').toLowerCase().includes('remote')).slice(0,4);
+    const sb = document.getElementById('sidebar-internships');
+    if (sb) {
+      sb.innerHTML = `
+        <div><strong>Paid internships</strong><div class="mini-list" style="margin-top:8px">${paid.map(i=>`<a class="mini-item" href="${getCardDetailsUrl(i.id,'internship',i.title)}"><div class="mini-icon">💼</div><div><div style="font-weight:700">${escapeHtml(i.title||'')}</div></div></a>`).join('')}</div></div>
+        <div style="margin-top:10px"><strong>Remote</strong><div class="mini-list" style="margin-top:8px">${remoteI.map(i=>`<a class="mini-item" href="${getCardDetailsUrl(i.id,'internship',i.title)}"><div class="mini-icon">🏠</div><div><div style="font-weight:700">${escapeHtml(i.title||'')}</div></div></a>`).join('')}</div></div>
+        <div style="margin-top:10px"><a href="internships.html">View all internships →</a></div>
+      `;
+    }
+  } catch(e){console.error('sidebar internships',e)}
+
+  // Exams sidebar
+  try {
+    const E = D.Exams || [];
+    const upcoming = (E||[]).filter(i=> i.testDate||i.registrationDeadline).map(i=>({...i,_d:new Date(i.testDate||i.registrationDeadline)})).filter(i=>i._d && i._d>new Date()).sort((a,b)=>a._d-b._d).slice(0,6);
+    const examsByType = [...new Set((E||[]).map(i=> (i.examType||'').trim()).filter(Boolean))].slice(0,6);
+    const sb = document.getElementById('sidebar-exams');
+    if (sb) {
+      sb.innerHTML = `
+        <div><strong>Upcoming exams</strong><div class="mini-list" style="margin-top:8px">${upcoming.map(i=>`<a class="mini-item" href="${getCardDetailsUrl(i.id,'exam',i.title)}"><div class="mini-icon">📋</div><div><div style="font-weight:700">${escapeHtml(i.title||'')}</div><div style="font-size:.82rem;color:var(--text-muted)">${formatDate(i.testDate||i.registrationDeadline||'')}</div></div></a>`).join('')}</div></div>
+        <div style="margin-top:10px"><strong>Exam types</strong><div class="chip-row" style="margin-top:8px">${examsByType.map(t=>`<button class="chip" onclick="filterTo('exams','examType','${escapeJsSingleQuote(t)}')">${escapeHtml(t)}</button>`).join('')}</div></div>
+        <div style="margin-top:10px"><a href="exams.html">View exams →</a></div>
+      `;
+    }
+  } catch(e){console.error('sidebar exams',e)}
+
+  // Books sidebar
+  try {
+    const B = D.Books || [];
+    const mdcat = B.filter(i=> (i.examType||'').toLowerCase().includes('mdcat')).slice(0,4);
+    const css = B.filter(i=> (i.examType||'').toLowerCase().includes('css')).slice(0,4);
+    const pdfs = B.filter(i=> i.isFree || (i.format||'').toLowerCase().includes('pdf')).slice(0,4);
+    const sb = document.getElementById('sidebar-books');
+    if (sb) {
+      sb.innerHTML = `
+        <div><strong>MDCAT books</strong><div class="mini-list" style="margin-top:8px">${mdcat.map(i=>`<a class="mini-item" href="${getCardDetailsUrl(i.id,'book',i.title)}"><div class="mini-icon">🩺</div><div><div style="font-weight:700">${escapeHtml(i.title||'')}</div></div></a>`).join('')}</div></div>
+        <div style="margin-top:10px"><strong>CSS books</strong><div class="mini-list" style="margin-top:8px">${css.map(i=>`<a class="mini-item" href="${getCardDetailsUrl(i.id,'book',i.title)}"><div class="mini-icon">⚖️</div><div><div style="font-weight:700">${escapeHtml(i.title||'')}</div></div></a>`).join('')}</div></div>
+        <div style="margin-top:10px"><strong>Free PDFs & Past Papers</strong><div class="mini-list" style="margin-top:8px">${pdfs.map(i=>`<a class="mini-item" href="${getCardDetailsUrl(i.id,'book',i.title)}"><div class="mini-icon">📄</div><div><div style="font-weight:700">${escapeHtml(i.title||'')}</div></div></a>`).join('')}</div></div>
+        <div style="margin-top:10px"><a href="books.html">View all books →</a></div>
+      `;
+    }
+  } catch(e){console.error('sidebar books',e)}
+
+  // Blogs sidebar
+  try {
+    const Bl = (D.Blogs||[]).filter(b=> b.isPublished !== false && b.is_published !== false);
+    const trending = Bl.slice(0,4);
+    const study = Bl.filter(b=> (b.category||'').toLowerCase().includes('study') || (b.tags||'').toLowerCase().includes('study')).slice(0,4);
+    const career = Bl.filter(b=> (b.category||'').toLowerCase().includes('career') || (b.tags||'').toLowerCase().includes('career')).slice(0,4);
+    const sb = document.getElementById('sidebar-blogs');
+    if (sb) {
+      sb.innerHTML = `
+        <div><strong>Trending posts</strong><div class="mini-list" style="margin-top:8px">${trending.map(i=>`<a class="mini-item" href="${getCardDetailsUrl(i.id,'blog',i.title)}"><div class="mini-icon">🔥</div><div><div style="font-weight:700">${escapeHtml(i.title||'')}</div></div></a>`).join('')}</div></div>
+        <div style="margin-top:10px"><strong>Study tips</strong><div class="mini-list" style="margin-top:8px">${study.map(i=>`<a class="mini-item" href="${getCardDetailsUrl(i.id,'blog',i.title)}"><div class="mini-icon">📚</div><div><div style="font-weight:700">${escapeHtml(i.title||'')}</div></div></a>`).join('')}</div></div>
+        <div style="margin-top:10px"><strong>Career guidance</strong><div class="mini-list" style="margin-top:8px">${career.map(i=>`<a class="mini-item" href="${getCardDetailsUrl(i.id,'blog',i.title)}"><div class="mini-icon">💼</div><div><div style="font-weight:700">${escapeHtml(i.title||'')}</div></div></a>`).join('')}</div></div>
+        <div style="margin-top:10px"><a href="blog.html">View all posts →</a></div>
+      `;
+    }
+  } catch(e){console.error('sidebar blogs',e)}
+}
+
+function filterTo(section, field, value) {
+  try {
+    // Basic navigation: open the main listing with query params
+    const url = `${section}.html?${encodeURIComponent(field)}=${encodeURIComponent(value)}`;
+    window.location.href = url;
+  } catch(e){ console.error('filterTo', e); }
+}
+
+window.renderSectionSidebars = renderSectionSidebars;
 function whenCMSReady(fn, requiredSheets) {
   if (typeof window.waitForCMSData === 'function') {
     window.waitForCMSData(requiredSheets || []).then(function () {

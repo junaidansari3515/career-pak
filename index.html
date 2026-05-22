@@ -455,7 +455,9 @@ body.dark .sw-pill:hover{background:rgba(45,212,191,.1);border-color:#2dd4bf;col
       <main>
 
         <!-- ① SCHOLARSHIPS -->
-        <div class="home-block" id="block-scholarships">
+        <section class="home-section-layout">
+          <div class="section-main">
+            <div class="home-block" id="block-scholarships">
           <div class="section-hd">
             <div class="section-hd-left">
               <div class="section-icon" style="background:#dcfce7;color:#16a34a">🎓</div>
@@ -473,10 +475,15 @@ body.dark .sw-pill:hover{background:rgba(45,212,191,.1);border-color:#2dd4bf;col
           <button class="show-more-btn" id="more-scholarships" onclick="toggleExtra('scholarships',this)" style="display:none">
             Show More <i class="fa fa-chevron-down"></i>
           </button>
-        </div>
+            </div>
+          </div>
+          <aside class="section-sidebar" id="sidebar-scholarships" aria-label="Scholarships sidebar"></aside>
+        </section>
 
         <!-- ② JOBS -->
-        <div class="home-block" id="block-jobs">
+        <section class="home-section-layout">
+          <div class="section-main">
+            <div class="home-block" id="block-jobs">
           <div class="section-hd">
             <div class="section-hd-left">
               <div class="section-icon" style="background:#dbeafe;color:#2563eb">💼</div>
@@ -494,10 +501,15 @@ body.dark .sw-pill:hover{background:rgba(45,212,191,.1);border-color:#2dd4bf;col
           <button class="show-more-btn" id="more-jobs" onclick="toggleExtra('jobs',this)" style="display:none">
             Show More <i class="fa fa-chevron-down"></i>
           </button>
-        </div>
+            </div>
+          </div>
+          <aside class="section-sidebar" id="sidebar-jobs" aria-label="Jobs sidebar"></aside>
+        </section>
 
         <!-- ③ INTERNSHIPS -->
-        <div class="home-block" id="block-internships">
+        <section class="home-section-layout">
+          <div class="section-main">
+            <div class="home-block" id="block-internships">
           <div class="section-hd">
             <div class="section-hd-left">
               <div class="section-icon" style="background:#fef3c7;color:#d97706">🚀</div>
@@ -515,69 +527,93 @@ body.dark .sw-pill:hover{background:rgba(45,212,191,.1);border-color:#2dd4bf;col
           <button class="show-more-btn" id="more-internships" onclick="toggleExtra('internships',this)" style="display:none">
             Show More <i class="fa fa-chevron-down"></i>
           </button>
-        </div>
+            </div>
+          </div>
+          <aside class="section-sidebar" id="sidebar-internships" aria-label="Internships sidebar"></aside>
+        </section>
 
         <!-- ④ EXAMS -->
         <div class="home-block" id="block-exams">
-          <div class="section-hd">
-            <div class="section-hd-left">
-              <div class="section-icon" style="background:#fce7f3;color:#db2777">📝</div>
-              <h2 class="section-h2">Upcoming Exams</h2>
-              <span class="section-count" id="cnt-exams">—</span>
-            </div>
-            <a href="exams.html" class="view-all-link">View All <i class="fa fa-arrow-right fa-xs"></i></a>
-          </div>
-          <div class="slider-row horizontal-slider" id="grid-exams">
-            <div class="skeleton-card"></div>
-            <div class="skeleton-card"></div>
-            <div class="skeleton-card"></div>
-          </div>
-          <div class="slider-extra" id="extra-exams"></div>
-          <button class="show-more-btn" id="more-exams" onclick="toggleExtra('exams',this)" style="display:none">
-            Show More <i class="fa fa-chevron-down"></i>
-          </button>
+            <section class="home-section-layout">
+              <div class="section-main">
+                <div class="home-block" id="block-exams">
+                  <div class="section-hd">
+                    <div class="section-hd-left">
+                      <div class="section-icon" style="background:#fce7f3;color:#db2777">📝</div>
+                      <h2 class="section-h2">Upcoming Exams</h2>
+                      <span class="section-count" id="cnt-exams">—</span>
+                    </div>
+                    <a href="exams.html" class="view-all-link">View All <i class="fa fa-arrow-right fa-xs"></i></a>
+                  </div>
+                  <div class="slider-row horizontal-slider" id="grid-exams">
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                  </div>
+                  <div class="slider-extra" id="extra-exams"></div>
+                  <button class="show-more-btn" id="more-exams" onclick="toggleExtra('exams',this)" style="display:none">
+                    Show More <i class="fa fa-chevron-down"></i>
+                  </button>
+                </div>
+              </div>
+              <aside class="section-sidebar" id="sidebar-exams" aria-label="Exams sidebar"></aside>
+            </section>
         </div>
 
         <!-- ⑤ BOOKS -->
         <div class="home-block" id="block-books">
-          <div class="section-hd">
-            <div class="section-hd-left">
-              <div class="section-icon" style="background:#ede9fe;color:#7c3aed">📚</div>
-              <h2 class="section-h2">Study Books</h2>
-              <span class="section-count" id="cnt-books">—</span>
-            </div>
-            <a href="books.html" class="view-all-link">View All <i class="fa fa-arrow-right fa-xs"></i></a>
-          </div>
-          <div class="slider-row horizontal-slider" id="grid-books">
-            <div class="skeleton-card"></div>
-            <div class="skeleton-card"></div>
-            <div class="skeleton-card"></div>
-          </div>
-          <div class="slider-extra" id="extra-books"></div>
-          <button class="show-more-btn" id="more-books" onclick="toggleExtra('books',this)" style="display:none">
-            Show More <i class="fa fa-chevron-down"></i>
-          </button>
+            <section class="home-section-layout">
+              <div class="section-main">
+                <div class="home-block" id="block-books">
+                  <div class="section-hd">
+                    <div class="section-hd-left">
+                      <div class="section-icon" style="background:#ede9fe;color:#7c3aed">📚</div>
+                      <h2 class="section-h2">Study Books</h2>
+                      <span class="section-count" id="cnt-books">—</span>
+                    </div>
+                    <a href="books.html" class="view-all-link">View All <i class="fa fa-arrow-right fa-xs"></i></a>
+                  </div>
+                  <div class="slider-row horizontal-slider" id="grid-books">
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                  </div>
+                  <div class="slider-extra" id="extra-books"></div>
+                  <button class="show-more-btn" id="more-books" onclick="toggleExtra('books',this)" style="display:none">
+                    Show More <i class="fa fa-chevron-down"></i>
+                  </button>
+                </div>
+              </div>
+              <aside class="section-sidebar" id="sidebar-books" aria-label="Books sidebar"></aside>
+            </section>
         </div>
 
         <!-- ⑥ BLOG -->
         <div class="home-block" id="block-blogs">
-          <div class="section-hd">
-            <div class="section-hd-left">
-              <div class="section-icon" style="background:#e0f2fe;color:#0284c7">✍️</div>
-              <h2 class="section-h2">Latest Blog Posts</h2>
-              <span class="section-count" id="cnt-blogs">—</span>
-            </div>
-            <a href="blog.html" class="view-all-link">View All <i class="fa fa-arrow-right fa-xs"></i></a>
-          </div>
-          <div class="slider-row horizontal-slider" id="grid-blogs">
-            <div class="skeleton-card"></div>
-            <div class="skeleton-card"></div>
-            <div class="skeleton-card"></div>
-          </div>
-          <div class="slider-extra" id="extra-blogs"></div>
-          <button class="show-more-btn" id="more-blogs" onclick="toggleExtra('blogs',this)" style="display:none">
-            Show More <i class="fa fa-chevron-down"></i>
-          </button>
+            <section class="home-section-layout">
+              <div class="section-main">
+                <div class="home-block" id="block-blogs">
+                  <div class="section-hd">
+                    <div class="section-hd-left">
+                      <div class="section-icon" style="background:#e0f2fe;color:#0284c7">✍️</div>
+                      <h2 class="section-h2">Latest Blog Posts</h2>
+                      <span class="section-count" id="cnt-blogs">—</span>
+                    </div>
+                    <a href="blog.html" class="view-all-link">View All <i class="fa fa-arrow-right fa-xs"></i></a>
+                  </div>
+                  <div class="slider-row horizontal-slider" id="grid-blogs">
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                  </div>
+                  <div class="slider-extra" id="extra-blogs"></div>
+                  <button class="show-more-btn" id="more-blogs" onclick="toggleExtra('blogs',this)" style="display:none">
+                    Show More <i class="fa fa-chevron-down"></i>
+                  </button>
+                </div>
+              </div>
+              <aside class="section-sidebar" id="sidebar-blogs" aria-label="Blogs sidebar"></aside>
+            </section>
         </div>
 
       </main>
@@ -1062,8 +1098,9 @@ function _homeInit() {
 
   } catch(err) { console.error('[CareerPK Home]', err); }
 
-  // Initialize horizontal sliders after home sections render
+  // Initialize horizontal sliders and contextual sidebars after home sections render
   if (typeof initHorizontalSliders === 'function') initHorizontalSliders();
+  if (typeof renderSectionSidebars === 'function') renderSectionSidebars();
 }
 
 // ── Section renderer ──────────────────────────────────────
