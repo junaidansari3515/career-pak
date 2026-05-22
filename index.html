@@ -54,8 +54,7 @@
   <link rel="stylesheet" href="css/main-enhanced.css"/>
 
   <!-- Non-critical CSS — loaded async via print trick, applied on load -->
-  <link rel="stylesheet" href="css/cms-additions.css"       media="print" onload="this.media='all'"/>
-  <link rel="stylesheet" href="css/design-enhancements.css" media="print" onload="this.media='all'"/>
+  <!-- cms-additions.css and design-enhancements.css merged into main-enhanced.css -->
   <link rel="stylesheet" href="css/premium-upgrades.css"    media="print" onload="this.media='all'"/>
   <link rel="stylesheet" href="css/perf-improvements.css"   media="print" onload="this.media='all'"/>
   <link rel="stylesheet" href="css/dark-mode-fixes.css"     media="print" onload="this.media='all'"/>
@@ -403,7 +402,7 @@ body.dark .sw-pill:hover{background:rgba(45,212,191,.1);border-color:#2dd4bf;col
       <div class="hero-logo-side">
         <picture>
           <source srcset="logo.webp" type="image/webp">
-          <img src="logo.webp" alt="Career Pakistan" class="hero-logo-img" fetchpriority="high" decoding="async"/>
+          <img src="logo.webp" alt="Career Pakistan" class="hero-logo-img" width="300" height="300" fetchpriority="high" decoding="async"/>
         </picture>
         <div class="hero-logo-ring" aria-hidden="true"></div>
       </div>
@@ -838,7 +837,7 @@ document.addEventListener('DOMContentLoaded', () => {
   updateFavCount();
   initMenu();
   if (typeof ensureChatbotLoaded === 'function') ensureChatbotLoaded();
-  onCMSReady(_homeInit);
+    _homeInit();
   if (typeof registerMultiTabRefresh === 'function') registerMultiTabRefresh(_homeInit);
   if (typeof initializeAutoRefreshListeners === 'function') initializeAutoRefreshListeners();
   _initNavbarScroll();
@@ -854,6 +853,107 @@ function _initNavbarScroll() {
       t = false;
     });
   }, { passive: true });
+}
+
+function _renderHomeSection(key) {
+  var section = SECTIONS.find(function (item) { return item.key === key; });
+  if (!section) return;
+  waitForCMSData([section.sheet], { timeout: 10000 }).then(function () {
+    try {
+      var items = sortItems((window.CMS_DATA[section.sheet] || []).slice(), section.sort);
+      if (typeof section.filter === 'function') items = section.filter(items);
+      _renderSection(section.key, items, section.renderer);
+      var grid = document.getElementById('grid-' + section.key);
+      if (typeof window.initLazyImages === 'function') {
+        window.initLazyImages(grid);
+      } else {
+        setTimeout(function () { if (typeof window.initLazyImages === 'function') window.initLazyImages(grid); }, 120);
+      }
+    } catch (err) {
+      console.error('[CareerPK Home] section render failed:', key, err);
+    }
+  });
+}
+
+function _renderHomeCounts() {
+  var counters = [
+    { id: 'sS', sheet: 'Scholarships' },
+    { id: 'sJ', sheet: 'Jobs' },
+    { id: 'sI', sheet: 'Internships' },
+    { id: 'sE', sheet: 'Exams' },
+    { id: 'sBk', sheet: 'Books' },
+    { id: 'sBl', sheet: 'Blogs' }
+  ];
+  counters.forEach(function (item) {
+    waitForCMSData([item.sheet], { timeout: 10000 }).then(function () {
+      _stat(item.id, (window.CMS_DATA[item.sheet] || []).length);
+    });
+  });
+}
+
+function _renderHomeSidebar() {
+  Promise.allSettled([
+    waitForCMSData(['Scholarships'], { timeout: 12000 }),
+    waitForCMSData(['Jobs'], { timeout: 12000 }),
+    waitForCMSData(['Internships'], { timeout: 12000 }),
+    waitForCMSData(['Exams'], { timeout: 12000 }),
+    waitForCMSData(['Blogs'], { timeout: 12000 })
+  ]).then(function () {
+    try {
+      var D = window.CMS_DATA || {};
+      var S = D.Scholarships || [];
+      var J = D.Jobs || [];
+      var I = D.Internships || [];
+      var E = D.Exams || [];
+      var Bl = (D.Blogs || []).filter(function (b) { return b.isPublished !== false && b.is_published !== false; });
+      var allItems = [].concat(
+        S.map(function (x) { return Object.assign({}, x, { _type: 'scholarship' }); }),
+        J.map(function (x) { return Object.assign({}, x, { _type: 'job' }); }),
+        I.map(function (x) { return Object.assign({}, x, { _type: 'internship' }); }),
+        E.map(function (x) { return Object.assign({}, x, { _type: 'exam' }); })
+      );
+      var now = new Date();
+      var soon = allItems
+        .map(function (i) {
+          var raw = i.deadline || i.registrationDeadline || i.registration_deadline || i.testDate || i.test_date || '';
+          var d = raw ? new Date(raw) : null;
+          return Object.assign({}, i, { _dl: d, _dlRaw: raw });
+        })
+        .filter(function (i) { return i._dl && i._dl > now; })
+        .sort(function (a, b) { return a._dl - b._dl; })
+        .slice(0, 7);
+      var typeIcon = { scholarship: '🎓', job: '💼', internship: '🚀', exam: '📝' };
+      _swRender('sw-deadlines', soon, function (i) {
+        return '<a class="sw-item" href="' + getCardDetailsUrl(i.id, i._type, i.title) + '">' +
+          '<span class="sw-icon">' + typeIcon[i._type] + '</span>' +
+          '<span class="sw-body"><span class="sw-title">' + escapeHtml(i.title || '') + '</span>' +
+          '<span class="sw-meta urgent"><i class="fa fa-clock fa-xs"></i> ' + formatDate(i._dlRaw) + '</span></span></a>';
+      }, 'No upcoming deadlines.', 3);
+      var featured = [].concat(S, J, I, E).filter(function (i) { return i.isFeatured === true || i.is_featured === true; }).slice(0, 6);
+      _swRender('sw-featured', featured, function (i) {
+        return '<a class="sw-item" href="' + getCardDetailsUrl(i.id, i._type, i.title) + '">' +
+          '<span class="sw-icon">⭐</span>' +
+          '<span class="sw-body"><span class="sw-title">' + escapeHtml(i.title || '') + '</span>' +
+          '<span class="sw-meta">' + escapeHtml(i._type.charAt(0).toUpperCase() + i._type.slice(1)) + '</span></span></a>';
+      }, 'No featured items yet.', 3);
+      var upE = sortItems(E, 'deadline').slice(0, 6);
+      _swRender('sw-exams', upE, function (e) {
+        return '<a class="sw-item" href="' + getCardDetailsUrl(e.id, 'exam', e.title) + '">' +
+          '<span class="sw-icon">📋</span>' +
+          '<span class="sw-body"><span class="sw-title">' + escapeHtml(e.title || '') + '</span>' +
+          '<span class="sw-meta">' + (e.conductingBody ? escapeHtml(e.conductingBody) + ' · ' : '') + formatDate(e.testDate || e.test_date || e.registrationDeadline || '') + '</span></span></a>';
+      }, 'No upcoming exams.', 3);
+      var recBl = sortItems(Bl, 'newest').slice(0, 6);
+      _swRender('sw-blogs', recBl, function (b) {
+        return '<a class="sw-item" href="' + getCardDetailsUrl(b.id, 'blog', b.title) + '">' +
+          '<span class="sw-icon">✍️</span>' +
+          '<span class="sw-body"><span class="sw-title">' + escapeHtml(b.title || '') + '</span>' +
+          '<span class="sw-meta">' + (b.category ? escapeHtml(b.category) + ' · ' : '') + formatDate(b.date || b.postedDate || b.posted_date || '') + '</span></span></a>';
+      }, 'No posts yet.', 3);
+    } catch (err) {
+      console.error('[CareerPK Sidebar]', err);
+    }
+  });
 }
 
 // ── Main init (called when CMS data is ready) ─────────────

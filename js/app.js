@@ -491,7 +491,7 @@ function openCardPost(id, type) {
 function cardScholarship(s) {
   const fav = isFav(s.id, 'scholarship');
   const src = getCardImage(s, 'scholarship');
-  const imgHTML = src ? `<img src="${TRANSPARENT_PLACEHOLDER}" data-src="${escapeHtml(src)}" alt="${escapeHtml(s.title)}" loading="lazy" onerror="this.onerror=null;this.src='${escapeHtml(GENERIC_IMAGE_FALLBACK)}';this.classList.remove('img-loading');this.classList.add('img-loaded');if(this.nextElementSibling){this.nextElementSibling.style.display='none';}">` : '';
+  const imgHTML = src ? `<img width="320" height="140" src="${TRANSPARENT_PLACEHOLDER}" data-src="${escapeHtml(src)}" alt="${escapeHtml(s.title)}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='${escapeHtml(GENERIC_IMAGE_FALLBACK)}';this.classList.remove('img-loading');this.classList.add('img-loaded');if(this.nextElementSibling){this.nextElementSibling.style.display='none';}">` : '';
   const loc = s.country || s.province || '';
   return `
   <div class="card" data-id="${s.id}" data-type="scholarship" role="button" tabindex="0" aria-label="View ${escapeHtml(s.title)}">
@@ -527,7 +527,7 @@ function cardScholarship(s) {
 function cardJob(j) {
   const fav = isFav(j.id, 'job');
   const src = getCardImage(j, 'job');
-  const imgHTML = src ? `<img src="${TRANSPARENT_PLACEHOLDER}" data-src="${escapeHtml(src)}" alt="${escapeHtml(j.title)}" loading="lazy" onerror="this.onerror=null;this.src='${escapeHtml(GENERIC_IMAGE_FALLBACK)}';this.classList.remove('img-loading');this.classList.add('img-loaded');if(this.nextElementSibling){this.nextElementSibling.style.display='none';}">` : '';
+  const imgHTML = src ? `<img width="320" height="140" src="${TRANSPARENT_PLACEHOLDER}" data-src="${escapeHtml(src)}" alt="${escapeHtml(j.title)}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='${escapeHtml(GENERIC_IMAGE_FALLBACK)}';this.classList.remove('img-loading');this.classList.add('img-loaded');if(this.nextElementSibling){this.nextElementSibling.style.display='none';}">` : '';
   return `
   <div class="card" data-id="${j.id}" data-type="job" role="button" tabindex="0" aria-label="View ${escapeHtml(j.title)}">
     <div class="card-img">
@@ -562,7 +562,7 @@ function cardJob(j) {
 function cardInternship(i) {
   const fav = isFav(i.id, 'internship');
   const src = getCardImage(i, 'internship');
-  const imgHTML = src ? `<img src="${TRANSPARENT_PLACEHOLDER}" data-src="${escapeHtml(src)}" alt="${escapeHtml(i.title)}" loading="lazy" onerror="this.onerror=null;this.src='${escapeHtml(GENERIC_IMAGE_FALLBACK)}';this.classList.remove('img-loading');this.classList.add('img-loaded');if(this.nextElementSibling){this.nextElementSibling.style.display='none';}">` : '';
+  const imgHTML = src ? `<img width="320" height="140" src="${TRANSPARENT_PLACEHOLDER}" data-src="${escapeHtml(src)}" alt="${escapeHtml(i.title)}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='${escapeHtml(GENERIC_IMAGE_FALLBACK)}';this.classList.remove('img-loading');this.classList.add('img-loaded');if(this.nextElementSibling){this.nextElementSibling.style.display='none';}">` : '';
   const paidCls = (i.type||'').toLowerCase()==='paid' ? 'paid' : 'unpaid';
   return `
   <div class="card" data-id="${i.id}" data-type="internship" role="button" tabindex="0" aria-label="View ${escapeHtml(i.title)}">
@@ -598,7 +598,7 @@ function cardInternship(i) {
 function cardExam(e) {
   const fav = isFav(e.id, 'exam');
   const src = getCardImage(e, 'exam');
-  const imgHTML = src ? `<img src="${TRANSPARENT_PLACEHOLDER}" data-src="${escapeHtml(src)}" alt="${escapeHtml(e.title)}" loading="lazy" onerror="this.onerror=null;this.src='${escapeHtml(GENERIC_IMAGE_FALLBACK)}';this.classList.remove('img-loading');this.classList.add('img-loaded');if(this.nextElementSibling){this.nextElementSibling.style.display='none';}">` : '';
+  const imgHTML = src ? `<img width="320" height="140" src="${TRANSPARENT_PLACEHOLDER}" data-src="${escapeHtml(src)}" alt="${escapeHtml(e.title)}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='${escapeHtml(GENERIC_IMAGE_FALLBACK)}';this.classList.remove('img-loading');this.classList.add('img-loaded');if(this.nextElementSibling){this.nextElementSibling.style.display='none';}">` : '';
   return `
   <div class="card" data-id="${e.id}" data-type="exam" role="button" tabindex="0" aria-label="View ${escapeHtml(e.title)}">
     <div class="card-img">
@@ -632,7 +632,7 @@ function cardExam(e) {
 function cardBook(b) {
   const fav = isFav(b.id, 'book');
   const src = getCardImage(b, 'book');
-  const imgHTML = src ? `<img src="${TRANSPARENT_PLACEHOLDER}" data-src="${escapeHtml(src)}" alt="${escapeHtml(b.title)}" loading="lazy" onerror="this.onerror=null;this.src='${escapeHtml(GENERIC_IMAGE_FALLBACK)}';this.classList.remove('img-loading');this.classList.add('img-loaded');if(this.nextElementSibling){this.nextElementSibling.style.display='none';}">` : '';
+  const imgHTML = src ? `<img width="320" height="140" src="${TRANSPARENT_PLACEHOLDER}" data-src="${escapeHtml(src)}" alt="${escapeHtml(b.title)}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='${escapeHtml(GENERIC_IMAGE_FALLBACK)}';this.classList.remove('img-loading');this.classList.add('img-loaded');if(this.nextElementSibling){this.nextElementSibling.style.display='none';}">` : '';
   return `
   <div class="card" data-id="${b.id}" data-type="book" role="button" tabindex="0" aria-label="View ${escapeHtml(b.title)}">
     <div class="card-img">
@@ -667,7 +667,7 @@ function cardBook(b) {
 function cardBlog(b) {
   const fav = isFav(b.id, 'blog');
   const src = getCardImage(b, 'blog');
-  const imgHTML = src ? `<img src="${TRANSPARENT_PLACEHOLDER}" data-src="${escapeHtml(src)}" alt="${escapeHtml(b.title)}" loading="lazy" onerror="this.onerror=null;this.src='${escapeHtml(GENERIC_IMAGE_FALLBACK)}';this.classList.remove('img-loading');this.classList.add('img-loaded');if(this.nextElementSibling){this.nextElementSibling.style.display='none';}">` : '';
+  const imgHTML = src ? `<img width="320" height="140" src="${TRANSPARENT_PLACEHOLDER}" data-src="${escapeHtml(src)}" alt="${escapeHtml(b.title)}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='${escapeHtml(GENERIC_IMAGE_FALLBACK)}';this.classList.remove('img-loading');this.classList.add('img-loaded');if(this.nextElementSibling){this.nextElementSibling.style.display='none';}">` : '';
   return `
   <div class="card" data-id="${b.id}" data-type="blog" role="button" tabindex="0" aria-label="Read ${escapeHtml(b.title)}">
     <div class="card-img">

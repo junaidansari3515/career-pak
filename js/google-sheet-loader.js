@@ -254,7 +254,7 @@ async function loadAllSheets() {
       });
   });
 
-  window._CMS_LOAD_PROMISE = Promise.all(tasks).then(() => {
+  window._CMS_LOAD_PROMISE = Promise.allSettled(tasks).then(() => {
     window.CMS_LOADING.global = false;
     if (typeof window._fireCMSReady === 'function') window._fireCMSReady();
     return window.CMS_DATA;
