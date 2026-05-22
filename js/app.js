@@ -842,6 +842,65 @@ function openCardDetails(item, type) {
   document.getElementById('cardDetailModal').style.display = 'block';
 }
 
+// ── Horizontal slider initializer: arrows, drag scrolling, keyboard ──
+function initHorizontalSliders() {
+  document.querySelectorAll('.horizontal-slider').forEach(function (container) {
+    if (container.dataset.sliderInit === '1') return;
+    container.dataset.sliderInit = '1';
+    container.setAttribute('tabindex', '0');
+
+    // Keyboard support
+    container.addEventListener('keydown', function (ev) {
+      if (ev.key === 'ArrowRight') {
+        ev.preventDefault();
+        container.scrollBy({ left: Math.round(container.clientWidth * 0.6), behavior: 'smooth' });
+      } else if (ev.key === 'ArrowLeft') {
+        ev.preventDefault();
+        container.scrollBy({ left: -Math.round(container.clientWidth * 0.6), behavior: 'smooth' });
+      }
+    });
+
+    // Drag-to-scroll (pointer events)
+    let isDown = false, startX = 0, scrollLeft = 0;
+    container.addEventListener('pointerdown', function (e) {
+      // Don't start drag when interacting with interactive controls inside cards
+      if (e.target.closest && e.target.closest('a,button,input,select,textarea,[role="button"]')) return;
+      isDown = true; startX = e.clientX; scrollLeft = container.scrollLeft; container.classList.add('is-dragging'); try { container.setPointerCapture(e.pointerId); } catch(_){}
+    });
+    container.addEventListener('pointermove', function (e) {
+      if (!isDown) return; const dx = startX - e.clientX; container.scrollLeft = scrollLeft + dx;
+    });
+    container.addEventListener('pointerup', function (e) { if (!isDown) return; isDown = false; container.classList.remove('is-dragging'); try { container.releasePointerCapture(e.pointerId); } catch(_){} });
+    container.addEventListener('pointercancel', function () { isDown = false; container.classList.remove('is-dragging'); });
+    container.addEventListener('mouseleave', function () { if (isDown) { isDown = false; container.classList.remove('is-dragging'); } });
+
+    // Add prev/next arrows into nearest section header when available
+    try {
+      const section = container.closest('.home-section') || container.parentElement;
+      const header = section ? section.querySelector('.section-hd') : null;
+      if (header && !header.querySelector('.slider-prev')) {
+        const prev = document.createElement('button');
+        prev.type = 'button'; prev.className = 'slider-arrow slider-prev'; prev.setAttribute('aria-label','Scroll left');
+        prev.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"></path></svg>';
+        prev.addEventListener('click', function () { container.scrollBy({ left: -Math.round(container.clientWidth * 0.6), behavior: 'smooth' }); });
+        header.appendChild(prev);
+      }
+      if (header && !header.querySelector('.slider-next')) {
+        const next = document.createElement('button');
+        next.type = 'button'; next.className = 'slider-arrow slider-next'; next.setAttribute('aria-label','Scroll right');
+        next.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"></path></svg>';
+        next.addEventListener('click', function () { container.scrollBy({ left: Math.round(container.clientWidth * 0.6), behavior: 'smooth' }); });
+        header.appendChild(next);
+      }
+    } catch (err) { /* non-critical */ }
+
+    // Ensure lazy images inside sliders are observed
+    if (typeof initLazyImages === 'function') try { initLazyImages(container); } catch (e) { /* ignore */ }
+  });
+}
+
+window.initHorizontalSliders = initHorizontalSliders;
+
 function closeCardDetails() {
   const overlay = document.getElementById('cardDetailOverlay');
   const modal = document.getElementById('cardDetailModal');

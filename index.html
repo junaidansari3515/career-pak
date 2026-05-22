@@ -464,7 +464,7 @@ body.dark .sw-pill:hover{background:rgba(45,212,191,.1);border-color:#2dd4bf;col
             </div>
             <a href="scholarships.html" class="view-all-link">View All <i class="fa fa-arrow-right fa-xs"></i></a>
           </div>
-          <div class="slider-row" id="grid-scholarships">
+          <div class="slider-row horizontal-slider" id="grid-scholarships">
             <div class="skeleton-card"></div>
             <div class="skeleton-card"></div>
             <div class="skeleton-card"></div>
@@ -485,7 +485,7 @@ body.dark .sw-pill:hover{background:rgba(45,212,191,.1);border-color:#2dd4bf;col
             </div>
             <a href="jobs.html" class="view-all-link">View All <i class="fa fa-arrow-right fa-xs"></i></a>
           </div>
-          <div class="slider-row" id="grid-jobs">
+          <div class="slider-row horizontal-slider" id="grid-jobs">
             <div class="skeleton-card"></div>
             <div class="skeleton-card"></div>
             <div class="skeleton-card"></div>
@@ -506,7 +506,7 @@ body.dark .sw-pill:hover{background:rgba(45,212,191,.1);border-color:#2dd4bf;col
             </div>
             <a href="internships.html" class="view-all-link">View All <i class="fa fa-arrow-right fa-xs"></i></a>
           </div>
-          <div class="slider-row" id="grid-internships">
+          <div class="slider-row horizontal-slider" id="grid-internships">
             <div class="skeleton-card"></div>
             <div class="skeleton-card"></div>
             <div class="skeleton-card"></div>
@@ -527,7 +527,7 @@ body.dark .sw-pill:hover{background:rgba(45,212,191,.1);border-color:#2dd4bf;col
             </div>
             <a href="exams.html" class="view-all-link">View All <i class="fa fa-arrow-right fa-xs"></i></a>
           </div>
-          <div class="slider-row" id="grid-exams">
+          <div class="slider-row horizontal-slider" id="grid-exams">
             <div class="skeleton-card"></div>
             <div class="skeleton-card"></div>
             <div class="skeleton-card"></div>
@@ -548,7 +548,7 @@ body.dark .sw-pill:hover{background:rgba(45,212,191,.1);border-color:#2dd4bf;col
             </div>
             <a href="books.html" class="view-all-link">View All <i class="fa fa-arrow-right fa-xs"></i></a>
           </div>
-          <div class="slider-row" id="grid-books">
+          <div class="slider-row horizontal-slider" id="grid-books">
             <div class="skeleton-card"></div>
             <div class="skeleton-card"></div>
             <div class="skeleton-card"></div>
@@ -569,7 +569,7 @@ body.dark .sw-pill:hover{background:rgba(45,212,191,.1);border-color:#2dd4bf;col
             </div>
             <a href="blog.html" class="view-all-link">View All <i class="fa fa-arrow-right fa-xs"></i></a>
           </div>
-          <div class="slider-row" id="grid-blogs">
+          <div class="slider-row horizontal-slider" id="grid-blogs">
             <div class="skeleton-card"></div>
             <div class="skeleton-card"></div>
             <div class="skeleton-card"></div>
@@ -1061,6 +1061,9 @@ function _homeInit() {
     }
 
   } catch(err) { console.error('[CareerPK Home]', err); }
+
+  // Initialize horizontal sliders after home sections render
+  if (typeof initHorizontalSliders === 'function') initHorizontalSliders();
 }
 
 // ── Section renderer ──────────────────────────────────────
