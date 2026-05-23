@@ -1171,28 +1171,26 @@ body.dark .stats-ribbon { background: #040e0d; }
 }
 
 
-/* Desktop drawer: keep nav hidden by default and open via hamburger */
+/* Desktop drawer: open as a left sidebar (consistent with mobile drawer) */
 @media (min-width: 769px) {
   .nav-links {
-    position: absolute !important;
-    top: 100%;
-    left: 0;
-    right: 0;
-    width: 100%;
+    display: none;
+    position: fixed;
+    top: 0; left: -320px;
+    width: min(86vw, 320px);
+    height: 100%;
     background: var(--bg-card);
-    border-top: 1px solid var(--border);
-    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    border-right: 1px solid var(--border);
     z-index: 1105;
     flex-direction: column;
     gap: 0;
-    padding: 12px 0;
-    overflow: auto;
-    transition: transform 0.28s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.18s ease;
-    transform-origin: top;
-    transform: translateY(-6px);
-    opacity: 0;
+    padding: 60px 0 2rem;
+    overflow-y: auto;
+    transition: left 0.32s cubic-bezier(0.4,0,0.2,1);
+    box-shadow: 4px 0 24px rgba(0,0,0,0.12);
+    flex-wrap: nowrap;
   }
-  .nav-links.active { display: flex !important; transform: translateY(0); opacity: 1; }
+  .nav-links.active { display: flex !important; left: 0; }
 
   /* Make dropdowns behave like mobile inside the drawer */
   .has-dropdown .dropdown {
