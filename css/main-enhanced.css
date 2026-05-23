@@ -799,6 +799,9 @@ body.dark .home-hero-title {
   .home-hero-actions .btn { text-align: center; }
 }
 
+/* Ensure hamburger is visible (override any desktop hiding rules) */
+.hamburger { display: flex !important; }
+
 /* ── Rich text / opportunity body styles ─────────────────── */
 .rich-text-block    { margin: 0 0 14px; line-height: 1.7; }
 .rich-text-paragraph { margin: 0 0 10px; line-height: 1.7; font-size: 0.92rem; color: var(--text-main); }

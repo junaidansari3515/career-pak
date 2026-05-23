@@ -266,7 +266,7 @@ body.dark .navbar { background: rgba(15, 23, 42, 0.92); }
 
 /* Desktop nav links */
 .nav-links {
-  display: flex;
+  display: none;
   align-items: center;
   gap: var(--space-3);
   list-style: none;
@@ -349,7 +349,7 @@ body.dark .navbar { background: rgba(15, 23, 42, 0.92); }
 
 /* Hamburger */
 .hamburger {
-  display: none;
+  display: flex;
   align-items: center;
   position: relative;
   justify-content: center;
@@ -1031,7 +1031,41 @@ body.dark .stats-ribbon { background: #040e0d; }
 }
 
 
+/* Desktop drawer: keep nav hidden by default and open via hamburger */
 @media (min-width: 769px) {
-  .hamburger { display: none !important; }
-  .nav-links { position: static !important; display: flex !important; height: auto !important; left: auto !important; box-shadow: none !important; }
+  .nav-links {
+    position: absolute !important;
+    top: 100%;
+    left: 0;
+    right: 0;
+    width: 100%;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    z-index: 1105;
+    flex-direction: column;
+    gap: 0;
+    padding: 12px 0;
+    overflow: auto;
+    transition: transform 0.28s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.18s ease;
+    transform-origin: top;
+    transform: translateY(-6px);
+    opacity: 0;
+  }
+  .nav-links.active { display: flex !important; transform: translateY(0); opacity: 1; }
+
+  /* Make dropdowns behave like mobile inside the drawer */
+  .has-dropdown .dropdown {
+    position: static;
+    box-shadow: none;
+    border: none;
+    border-radius: 0;
+    background: var(--bg-alt);
+    display: none;
+    padding: 0;
+  }
+  .has-dropdown.accordion-open .dropdown { display: block; }
+
+  .nav-links > li { width: 100%; border-bottom: 1px solid var(--border); }
+  .nav-links > li > a { display: block; padding: 12px 20px; font-size: 0.95rem; }
 }

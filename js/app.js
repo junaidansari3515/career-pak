@@ -1573,7 +1573,7 @@ function openMenu() {
   document.body.style.overflow = 'hidden';
 
   const navLinks = document.getElementById('navLinks');
-  if (navLinks && isMobile()) navLinks.classList.add('active');
+  if (navLinks) navLinks.classList.add('active');
 }
 
 function closeMenu() {
@@ -1623,7 +1623,8 @@ function initMenu() {
       const link = item.querySelector(':scope > a');
       if (!link) return;
       link.addEventListener('click', (e) => {
-        if (!isMobile()) return; // desktop uses hover
+        // Allow accordion behavior on mobile or when the drawer/menu is open on desktop
+        if (!isMobile() && !menuOpen) return; // desktop hovering preserves original behavior
         e.preventDefault();
         const isOpen = item.classList.contains('accordion-open');
         navLinks.querySelectorAll('.has-dropdown.accordion-open').forEach(el => el.classList.remove('accordion-open'));
