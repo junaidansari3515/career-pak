@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="robots" content="index, follow, max-image-preview:large"/>
+  <meta name="author" content="Career Pakistan"/>
+  <title>Notifications — Career Pakistan</title>
+  <meta name="description" content="Site notifications and important alerts from Career Pakistan."/>
+  <link rel="canonical" href="https://careerpk.online/notifications.html"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://careerpk.online/notifications.html"/>
+  <meta property="og:title" content="Notifications — Career Pakistan"/>
+  <meta property="og:description" content="Site notifications and important alerts from Career Pakistan."/>
+  <meta property="og:image" content="https://careerpk.online/banner.webp"/>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/main-enhanced.css"/>
+  <link rel="stylesheet" href="css/perf-improvements.css"/>
+  <link rel="stylesheet" href="css/dark-mode-fixes.css" media="print" onload="this.media='all'"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="manifest" href="manifest.json"/>
+  <script src="js/cms-bootstrap.js"></script>
+  <script src="js/analytics-loader.js" defer></script>
+</head>
+<body>
+<nav class="navbar" id="navbar"><div class="nav-container"><a href="index.html" class="nav-logo"><img src="logo.webp" alt="Career Pakistan" width="44" height="44"/></a><ul class="nav-links" id="navLinks"><li><a href="index.html">Home</a></li><li><a href="scholarships.html">Scholarships</a></li><li><a href="jobs.html">Jobs</a></li><li><a href="internships.html">Internships</a></li><li><a href="exams.html">Exams</a></li><li><a href="books.html">Books</a></li><li><a href="notifications.html">Notifications</a></li><li><a href="blog.html">Blog</a></li></ul><div class="nav-actions"><button class="nav-icon-btn" onclick="toggleSearch()" aria-label="Search"><i class="fa fa-search"></i></button><a href="favorites.html" class="nav-icon-btn" aria-label="Saved"><i class="fa fa-bookmark"></i><span class="fav-count" id="favCount" style="display:none">0</span></a><button class="nav-icon-btn" onclick="toggleDarkMode()" id="themeBtn" aria-label="Toggle dark mode"><i class="fa fa-moon"></i></button><button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><i class="fa fa-bars"></i></button></div></div><div class="nav-search" id="navSearch"><div class="nav-container"><form action="search.html" method="GET" class="search-form-nav"><i class="fa fa-search"></i><input type="text" name="q" id="navSearchInput" placeholder="Search notifications..."/><button type="submit">Search</button></form></div></div></nav>
+
+<main class="section"><div class="container"><div class="page-header"><h1 class="page-title">🔔 Notifications</h1><p class="page-subtitle">Important messages and site-wide alerts.</p></div>
+  <div id="notificationsGrid" class="cards-grid"></div>
+</div></main>
+
+<footer class="footer"><div class="container"><div class="footer-grid"><div class="footer-brand"><a href="index.html" class="footer-logo">Career <span>Pakistan</span></a><p>Pakistan's trusted platform for students and professionals — scholarships, jobs, internships, exams, and books updated daily.</p></div><div class="footer-col"><h4>Explore</h4><ul><li><a href="scholarships.html">Scholarships</a></li><li><a href="jobs.html">Jobs</a></li><li><a href="internships.html">Internships</a></li><li><a href="books.html">Books</a></li><li><a href="blog.html">Blog</a></li></ul></div><div class="footer-col"><h4>Exam Hub</h4><ul><li><a href="exams.html">All Exams</a></li><li><a href="exams-mdcat.html">MDCAT</a></li><li><a href="exams-css.html">CSS</a></li><li><a href="exams-ppsc.html">PPSC</a></li></ul></div><div class="footer-col"><h4>Company</h4><ul><li><a href="about.html">About Us</a></li><li><a href="contact.html">Contact</a></li><li><a href="privacy.html">Privacy Policy</a></li><li><a href="terms.html">Terms of Use</a></li></ul></div></div><div class="footer-bottom"><p>© 2026 Career Pakistan. All rights reserved.</p></div></div></footer>
+
+<script src="js/google-sheet-loader.js"></script>
+<script src="js/app.js" defer></script>
+<script>document.addEventListener('cmsLoadReady',()=>{const grid=document.getElementById('notificationsGrid');const items=(window.CMS_DATA.Notifications||[]).filter(n=>n.isActive);if(!grid){return;}if(items.length===0){grid.innerHTML='<div class="empty-state"><i class="fa fa-bell"></i><h3>No notifications</h3><p>There are no active notifications at this time.</p></div>';return;}grid.innerHTML=items.map(n=>`<article class="card"><div class="card-body"><h3>${(n.priority||'').toUpperCase()}</h3><p>${(n.message||'')}</p><p style="margin-top:.5rem"><a href="${n.link||'#'}" target="_blank" rel="noopener">Read more</a></p></div></article>`).join('');});</script>
+</body>
+</html>

@@ -2035,6 +2035,22 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+// Auto-hide open nav search when user scrolls down
+function initAutoHideNavSearch() {
+  const navSearch = document.getElementById('navSearch');
+  if (!navSearch) return;
+  let lastY = window.scrollY;
+  window.addEventListener('scroll', () => {
+    const currentY = window.scrollY;
+    const delta = currentY - lastY;
+    if (delta > 6 && navSearch.classList.contains('open')) {
+      navSearch.classList.remove('open');
+      document.getElementById('navSearchInput')?.blur();
+    }
+    lastY = currentY;
+  }, { passive: true });
+}
+
 document.addEventListener('click', (event) => {
   const target = event.target;
   if (!target) return;
@@ -2158,6 +2174,7 @@ function initGlobalSitePolish() {
   injectAdPlaceholders();
   injectCompactSidebarAds();
   initMobileSmartFilterBar();
+  initAutoHideNavSearch();
     initPWA();
 }
 
