@@ -223,28 +223,7 @@
       </div>
     
       </div>
-      <aside style="position:sticky;top:75px;display:flex;flex-direction:column;gap:1.1rem">
-        <div class="sw">
-          <p class="sw-h">⏰ Closing Soon</p>
-          <div id="pgSbDeadlines"><div class="skeleton-card" style="height:48px;margin-bottom:.35rem"></div><div class="skeleton-card" style="height:48px"></div></div>
-        </div>
-        <div class="sw">
-          <p class="sw-h">⭐ Featured</p>
-          <div id="pgSbFeatured"><div class="skeleton-card" style="height:48px"></div></div>
-        </div>
-        <div class="sw">
-          <p class="sw-h">🔗 Quick Links</p>
-          <nav>
-            <a href="scholarships.html" class="sw-ql"><i class="fa fa-graduation-cap fa-fw"></i> Scholarships</a>
-            <a href="jobs.html" class="sw-ql"><i class="fa fa-briefcase fa-fw"></i> Jobs</a>
-            <a href="internships.html" class="sw-ql"><i class="fa fa-rocket fa-fw"></i> Internships</a>
-            <a href="exams.html" class="sw-ql"><i class="fa fa-file-alt fa-fw"></i> Exams</a>
-            <a href="books.html" class="sw-ql"><i class="fa fa-book fa-fw"></i> Books</a>
-            <a href="blog.html" class="sw-ql"><i class="fa fa-pen fa-fw"></i> Blog</a>
-            <a href="search.html" class="sw-ql"><i class="fa fa-search fa-fw"></i> Search All</a>
-          </nav>
-        </div>
-      </aside>
+      <aside id="pageSidebar" style="position:sticky;top:75px;display:flex;flex-direction:column;gap:1.1rem"></aside>
     </div>
   </div>
   </main>
@@ -292,13 +271,92 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       updateFavCount();
-      waitForCMSData(['Scholarships']).then(() => {
+      waitForCMSData(['Scholarships','Exams']).then(() => {
         loadData();
+        renderPageSidebar();
         updateFavCount();
       });
       registerAutoRefreshSection('Scholarships', loadData);
       initializeAutoRefreshListeners();
     });
+
+    function renderPageSidebar() {
+      const sidebar = document.getElementById('pageSidebar');
+      if (!sidebar) return;
+
+      const scholarshipItems = (window.CMS_DATA.Scholarships || [])
+        .filter(item => item.deadline)
+        .sort((a, b) => new Date(a.deadline) - new Date(b.deadline))
+        .slice(0, 5);
+
+      const examItems = (window.CMS_DATA.Exams || [])
+        .slice()
+        .sort((a, b) => new Date(a.testDate || a.registrationDeadline || 0) - new Date(b.testDate || b.registrationDeadline || 0))
+        .slice(0, 4);
+
+      const metaLinks = [
+        { href: 'https://hec.gov.pk', label: 'HEC', meta: 'Official higher education authority' },
+        { href: 'https://usefp.org', label: 'USEFP', meta: 'USA-Pakistan scholarship program' },
+        { href: 'https://fulbright.edu.pk', label: 'Fulbright', meta: 'Fulbright Pakistan' },
+        { href: 'https://daad.de', label: 'DAAD', meta: 'German academic exchange' },
+        { href: 'https://britishcouncil.pk', label: 'British Council', meta: 'UK education and exams' }
+      ];
+
+      sidebar.innerHTML = [
+        renderSidebarWidget('⏰ Deadline Tracker', scholarshipItems, 'scholarship', 5, true),
+        renderSidebarWidget('📝 Related Exams', examItems, 'exam', 4, false),
+        renderExternalWidget('🌐 Official Resources', metaLinks)
+      ].join('');
+    }
+
+    function safeText(value) {
+      return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function getSidebarHref(item, type) {
+      if (item.apply_link) return item.apply_link;
+      if (item.url) return item.url;
+      if (item.link) return item.link;
+      if (item.detail_url) return item.detail_url;
+      if (item.id) return 'opportunity.html?type=' + encodeURIComponent(type) + '&id=' + encodeURIComponent(item.id);
+      return '#';
+    }
+
+    function formatSidebarDate(value) {
+      const date = new Date(value);
+      if (isNaN(date)) return safeText(value || '');
+      return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+    }
+
+    function renderSidebarItem(item, type, showDate) {
+      const title = safeText(item.title || item.name || item.position || item.exam_name || item.book_title || 'View details');
+      const href = getSidebarHref(item, type);
+      const meta = showDate
+        ? formatSidebarDate(item.deadline || item.testDate || item.registrationDeadline || item.date || item.publishDate)
+        : safeText(item.location || item.category || item.author || item.organization || item.type || '');
+
+      return `<div class="sw-item"><a class="sw-title" href="${href}">${title}</a>${meta ? `<p class="sw-meta">${meta}</p>` : ''}</div>`;
+    }
+
+    function renderSidebarWidget(title, items, type, count, showDate) {
+      const content = items.slice(0, count).map(item => renderSidebarItem(item, type, showDate)).join('') || '<p class="sw-meta">No items available.</p>';
+      return `<div class="sw"><p class="sw-h">${safeText(title)}</p><div class="sw-body">${content}</div></div>`;
+    }
+
+    function renderExternalWidget(title, links) {
+      const content = links.map(link => `
+        <div class="sw-item">
+          <a class="sw-title" href="${link.href}" target="_blank" rel="noopener">${safeText(link.label)}</a>
+          <p class="sw-meta">${safeText(link.meta || '')}</p>
+        </div>
+      `).join('');
+      return `<div class="sw"><p class="sw-h">${safeText(title)}</p><div class="sw-body">${content}</div></div>`;
+    }
 
     function loadData() {
       try {
@@ -325,9 +383,7 @@
       );
 
       filtered = sortItems(filtered, sort);
-      document.getElementById('resultsCount').textContent = `${filtered.length} national scholarship${
-        filtered.length !== 1 ? 's' : ''
-      } found`;
+      document.getElementById('resultsCount').textContent = `${filtered.length} national scholarship${filtered.length !== 1 ? 's' : ''} found`;
       renderCards(filtered, 'resultsGrid', 'scholarship');
       document.getElementById('emptyState').style.display = filtered.length === 0 ? 'flex' : 'none';
     }
