@@ -97,9 +97,13 @@
 
 <section class="section">
   <div class="container">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:.5rem">
-      <span id="blogResultsCount" style="font-size:.85rem;color:var(--text-muted)">Loading...</span>
-      <select class="filter-select" id="blogSort" onchange="applyBlogFilters()" style="font-size:.82rem;padding:.4rem .75rem">
+    <div class="results-info">
+      <span id="blogResultsCount">Loading...</span>
+      <div class="view-toggle">
+        <button type="button" class="view-btn active" id="gridView" onclick="setView('grid')" title="Grid view"><i class="fa fa-th"></i></button>
+        <button type="button" class="view-btn" id="listView" onclick="setView('list')" title="List view"><i class="fa fa-list"></i></button>
+      </div>
+      <select class="filter-select" id="blogSort" onchange="applyBlogFilters()" style="font-size:.82rem;padding:.4rem .75rem;margin-left:auto">
         <option value="newest">Newest First</option>
         <option value="oldest">Oldest First</option>
       </select>

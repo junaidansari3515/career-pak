@@ -197,10 +197,10 @@
 
   <main class="section">
     <div class="container">
-    <div style="display:grid;grid-template-columns:1fr 290px;gap:2rem;align-items:start">
-      <div>
+    <div class="subpage-layout">
+      <div class="subpage-main">
 
-      <div class="results-info"><span id="resultsCount">Loading...</span></div>
+      <div class="results-info"><span id="resultsCount">Loading...</span><div class="view-toggle"><button type="button" class="view-btn active" id="gridView" onclick="setView('grid')" title="Grid view"><i class="fa fa-th"></i></button><button type="button" class="view-btn" id="listView" onclick="setView('list')" title="List view"><i class="fa fa-list"></i></button></div></div>
 
       <div class="cards-grid" id="resultsGrid">
         <div class="skeleton-card"></div>

@@ -36,14 +36,14 @@
     </div></div><div class="nav-search" id="navSearch"><div class="nav-container"><form action="search.html" method="GET" class="search-form-nav"><i class="fa fa-search"></i><input type="text" name="q" id="navSearchInput" placeholder="Search jobs, scholarships, exams..."/><button type="submit">Search</button></form></div></div></nav>
 <main class="section">
   <div class="container">
-    <div style="display:grid;grid-template-columns:1fr 290px;gap:2rem;align-items:start">
-      <div>
+    <div class="subpage-layout">
+      <div class="subpage-main">
         <div class="page-header" style="margin-bottom:1.5rem">
           <h1 class="page-title">🚀 Internships in Pakistan</h1>
           <p class="page-subtitle">120+ verified internship opportunities for students, graduates, and young professionals.</p>
           <p class="page-subtitle">Search remote, part-time, and campus placements across Pakistan.</p>
         </div>
-        <div id="resultsCount" class="results-count" style="margin-bottom:.75rem;font-size:.84rem;color:var(--text-muted)">Loading…</div>
+        <div class="results-info"><span id="resultsCount">Loading…</span><div class="view-toggle"><button type="button" class="view-btn active" id="gridView" onclick="setView('grid')" title="Grid view"><i class="fa fa-th"></i></button><button type="button" class="view-btn" id="listView" onclick="setView('list')" title="List view"><i class="fa fa-list"></i></button></div></div>
         <div class="cards-grid" id="resultsGrid">
           <div class="skeleton-card"></div>
           <div class="skeleton-card"></div>
