@@ -89,6 +89,7 @@
   <div class="container">
     <div class="filter-row">
       <div class="filter-left">
+        <input type="search" id="searchInput" placeholder="Search..." class="filter-search-input" oninput="applyFilters()" aria-label="Search books" />
         <select class="filter-select" id="filterCategory" onchange="applyFilters()">
           <option value="">📂 All Categories</option>
           <option value="CSS/PMS">CSS / PMS</option>
@@ -225,10 +226,12 @@ function applyFilters() {
   const cat  = document.getElementById('filterCategory').value;
   const free = document.getElementById('filterFree').value;
   const sort = document.getElementById('sortBy').value;
+  const search = (document.getElementById('searchInput')?.value || '').toLowerCase();
 
   let items = allBooks.slice();
   if (cat)  items = items.filter(b => matchesFilterValue(b.category, cat) || matchesFilterValue(b.exam_type, cat));
   if (free) items = items.filter(b => b.is_free === true || String(b.is_free).toLowerCase() === 'true' || String(b.is_free).toLowerCase() === 'yes');
+  if (search) items = items.filter(b => (b.title || '').toLowerCase().includes(search) || (b.description || '').toLowerCase().includes(search) || (b.organization || '').toLowerCase().includes(search));
 
   if (sort === 'az')   items.sort((a,b) => (a.title||'').localeCompare(b.title||''));
   else if (sort === 'free') items.sort((a,b) => (b.is_free ? 1 : 0) - (a.is_free ? 1 : 0));
@@ -270,6 +273,7 @@ function renderBookCard(b) {
 }
 
 function clearFilters() {
+  document.getElementById('searchInput').value = '';
   document.getElementById('filterCategory').value = '';
   document.getElementById('filterFree').value = '';
   document.getElementById('sortBy').value = 'newest';

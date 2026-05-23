@@ -154,6 +154,7 @@
     <div class="container">
       <div class="filter-row">
         <div class="filter-left">
+          <input type="search" id="searchInput" placeholder="Search..." class="filter-search-input" oninput="applyFilters()" aria-label="Search scholarships" />
           <label class="sr-only" for="filterFunding">Filter by funding type</label>
           <select class="filter-select" id="filterFunding" onchange="applyFilters()">
             <option value="">💰 All Funding</option>
@@ -374,12 +375,14 @@
       const type = document.getElementById('filterType').value;
       const level = document.getElementById('filterLevel').value;
       const sort = document.getElementById('sortBy').value;
+      const search = (document.getElementById('searchInput')?.value || '').toLowerCase();
 
       let filtered = allData.filter(
         (s) =>
           (!funding || s.funding === funding) &&
           (!type || s.type === type) &&
-          (!level || (s.level || '').includes(level))
+          (!level || (s.level || '').includes(level)) &&
+          (!search || [s.title, s.description, s.organization].some((field) => (field || '').toLowerCase().includes(search)))
       );
 
       filtered = sortItems(filtered, sort);
@@ -389,6 +392,7 @@
     }
 
     function clearFilters() {
+      document.getElementById('searchInput').value = '';
       ['filterFunding', 'filterType', 'filterLevel'].forEach((id) => {
         document.getElementById(id).value = '';
       });
