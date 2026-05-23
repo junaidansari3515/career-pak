@@ -14,13 +14,13 @@
   <meta property="og:url" content="https://careerpk.online/books.html"/>
   <meta property="og:title" content="Books &amp; Study Material Pakistan | Career Pakistan"/>
   <meta property="og:description" content="Download free CSS, PPSC, FPSC, MDCAT, and NTS study books with past papers and PDF resources for Pakistani students."/>
-  <meta property="og:image" content="https://careerpk.online/banner.png"/>
+  <meta property="og:image" content="https://careerpk.online/banner.webp"/>
   <meta property="og:site_name" content="Career Pakistan"/>
   <meta property="og:locale" content="en_PK"/>
   <meta name="twitter:card" content="summary_large_image"/>
   <meta name="twitter:title" content="Books &amp; Study Material Pakistan | Career Pakistan"/>
   <meta name="twitter:description" content="Download free CSS, PPSC, FPSC, MDCAT, and NTS study books with past papers and PDF resources for Pakistani students."/>
-  <meta name="twitter:image" content="https://careerpk.online/banner.png"/>
+  <meta name="twitter:image" content="https://careerpk.online/banner.webp"/>
   <link rel="dns-prefetch" href="https://fonts.googleapis.com"/>
   <link rel="dns-prefetch" href="https://i.ibb.co"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -32,7 +32,7 @@
   <link rel="stylesheet" href="css/perf-improvements.css"/>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-  <link rel="icon" href="logo.png" type="image/webp"/>
+  <link rel="icon" href="logo.webp" type="image/webp"/>
   <link rel="apple-touch-icon" href="logo.webp"/>
   <link rel="manifest" href="manifest.json"/>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"CollectionPage","name":"Books & Study Material Pakistan","url":"https://careerpk.online/books.html"}</script>
@@ -247,13 +247,13 @@ function applyFilters() {
 }
 
 function renderBookCard(b) {
-  const img = escapeHtml(b.image_url || (b.image_links && b.image_links[0]) || 'banner.png');
+  const img = escapeHtml(b.image_url || (b.image_links && b.image_links[0]) || 'banner.webp');
   const isFree = b.is_free === true || String(b.is_free).toLowerCase() === 'true' || String(b.is_free).toLowerCase() === 'yes';
   const downloadUrl = safeUrl(b.download_link || (b.pdf_links && b.pdf_links[0]) || b.apply_link || '');
   const detailUrl = `opportunity.html?type=book&id=${encodeURIComponent(b.id)}`;
   return `<div class="card">
     <div class="card-img" style="height:200px;overflow:hidden;position:relative">
-      <img src="${img}" alt="${escapeHtml(b.title||'Book')}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover" onerror="this.src='banner.png'"/>
+      <img src="${img}" alt="${escapeHtml(b.title||'Book')}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover" onerror="this.src='banner.webp'"/>
       ${isFree ? '<span style="position:absolute;top:.5rem;left:.5rem;background:#16a34a;color:#fff;font-size:.68rem;font-weight:700;padding:.2rem .55rem;border-radius:var(--radius-full)">✅ Free PDF</span>' : ''}
     </div>
     <div class="card-body">
