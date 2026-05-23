@@ -904,12 +904,20 @@ body.dark .stats-ribbon { background: #040e0d; }
 :root { --max-width: min(1180px, calc(100vw - 2rem)); }
 
 .cards-grid {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
 }
 .cards-grid > .card,
 .cards-grid > .skeleton-card {
   height: 100%;
 }
+.card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.card-footer { margin-top: auto; }
 
 /* Search/filter rows and compact mobile controls */
 .filter-row,
@@ -1004,13 +1012,15 @@ body.dark .stats-ribbon { background: #040e0d; }
   }
 }
 
-@media (min-width: 769px) and (max-width: 1180px) {
-  .cards-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+@media (max-width: 900px) {
+  .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
-@media (min-width: 1600px) {
+@media (max-width: 480px) {
+  .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
+}
+
+@media (min-width: 1400px) {
   :root { --max-width: 1440px; }
   .cards-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
