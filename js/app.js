@@ -17,111 +17,281 @@ function fetchSheet(sheetName) {
 // ── Sidebar rendering: populate per-section contextual sidebars ──
 function renderSectionSidebars() {
   const D = window.CMS_DATA || {};
-  
+
+  const renderWidget = (title, bodyHtml, viewAllHref) => `
+    <div class="sw">
+      <div class="sw-h">${escapeHtml(title)}</div>
+      ${bodyHtml}
+      <a class="sw-all" href="${viewAllHref}">View all →</a>
+    </div>
+  `;
+
+  const renderItem = (href, icon, title, meta, metaClass) => `
+    <a class="sw-item" href="${href}">
+      <span class="sw-icon">${icon}</span>
+      <span class="sw-body">
+        <span class="sw-title">${escapeHtml(title)}</span>
+        ${meta ? `<span class="sw-meta${metaClass ? ` ${metaClass}` : ''}">${escapeHtml(meta)}</span>` : ''}
+      </span>
+    </a>
+  `;
+
+  const renderPills = (items, section, field) => {
+    if (!items.length) return `<div class="sw-empty">No items available.</div>`;
+    return `
+      <div class="sw-pills">
+        ${items.map(item => `
+          <button class="sw-pill" type="button" onclick="filterTo('${section}','${field}','${escapeJsSingleQuote(item)}')">${escapeHtml(item)}</button>
+        `).join('')}
+      </div>
+    `;
+  };
+
+  const renderResources = (links) => {
+    if (!links.length) return `<div class="sw-empty">No resources available.</div>`;
+    return `
+      <div class="sw-resources">
+        ${links.map(link => `
+          <a class="sw-resource-item" href="${safeUrl(link.url)}" target="_blank" rel="noreferrer noopener">
+            <span class="sw-resource-body">
+              <span class="sw-resource-name">${escapeHtml(link.name)}</span>
+              ${link.desc ? `<span class="sw-resource-desc">${escapeHtml(link.desc)}</span>` : ''}
+            </span>
+            <span class="sw-resource-icon"><i class="fa fa-arrow-up-right-from-square" aria-hidden="true"></i></span>
+          </a>
+        `).join('')}
+      </div>
+    `;
+  };
+
+  const renderSection = (id, html) => {
+    const container = document.getElementById(id);
+    if (container) container.innerHTML = html;
+  };
+
   // Scholarships sidebar
   try {
     const s = D.Scholarships || [];
-    const nearDeadlines = (s || []).filter(i => i.deadline).map(i => ({...i, _d:new Date(i.deadline)})).filter(i => i._d > new Date()).sort((a,b)=>a._d-b._d).slice(0,4);
-    const fullyFunded = (s || []).filter(i => (i.funding||'').toLowerCase().includes('full')) .slice(0,4);
-    const degrees = [...new Set((s||[]).map(i=> (i.level||'').trim()).filter(Boolean))].slice(0,6);
-    const countries = [...new Set((s||[]).map(i=> (i.country||i.location||'').trim()).filter(Boolean))].slice(0,6);
-    const sb = document.getElementById('sidebar-scholarships');
-    if (sb) {
-      sb.innerHTML = `
-        <div class="mini-list">
-          <div><strong>Closing Soon</strong></div>
-          ${nearDeadlines.map(i=>`<a class="mini-item" href="${getCardDetailsUrl(i.id,'scholarship',i.title)}"><div class="mini-icon">🎓</div><div><div style="font-weight:700">${escapeHtml(i.title||'')}</div><div style="font-size:.82rem;color:var(--text-muted)">${formatDate(i.deadline)}</div></div></a>`).join('')}
-        </div>
-        <div style="margin-top:10px"><strong>Fully funded</strong>
-          <div class="mini-list" style="margin-top:8px">${fullyFunded.map(i=>`<a class="mini-item" href="${getCardDetailsUrl(i.id,'scholarship',i.title)}"><div class="mini-icon">💰</div><div><div style="font-weight:700">${escapeHtml(i.title||'')}</div></div></a>`).join('')}</div>
-        </div>
-        <div style="margin-top:10px"><strong>Degrees</strong><div class="chip-row" style="margin-top:8px">${degrees.map(d=>`<button class="chip" onclick="filterTo('scholarships','level','${escapeJsSingleQuote(d)}')">${escapeHtml(d)}</button>`).join('')}</div></div>
-        <div style="margin-top:10px"><strong>Countries</strong><div class="chip-row" style="margin-top:8px">${countries.map(c=>`<button class="chip" onclick="filterTo('scholarships','country','${escapeJsSingleQuote(c)}')">${escapeHtml(c)}</button>`).join('')}</div></div>
-        <div style="margin-top:10px"><a href="scholarships.html">View all scholarships →</a></div>
-      `;
-    }
-  } catch(e){console.error('sidebar scholarships',e)}
+    const nearDeadlines = (s || [])
+      .filter(i => i.deadline)
+      .map(i => ({ ...i, _d: new Date(i.deadline) }))
+      .filter(i => i._d > new Date())
+      .sort((a, b) => a._d - b._d)
+      .slice(0, 4);
+    const fullyFunded = (s || [])
+      .filter(i => (i.funding || '').toLowerCase().includes('full'))
+      .slice(0, 4);
+    const degrees = [...new Set((s || []).map(i => (i.level || '').trim()).filter(Boolean))].slice(0, 6);
+
+    const scholarshipWidget = `
+      ${renderWidget('⏰ Closing Soon', nearDeadlines.length
+        ? nearDeadlines.map(i => renderItem(
+            getCardDetailsUrl(i.id, 'scholarship', i.title),
+            '🎓',
+            i.title || 'Scholarship',
+            formatDate(i.deadline)
+          )).join('')
+        : '<div class="sw-empty">No upcoming deadlines.</div>'
+      , 'scholarships.html')}
+      ${renderWidget('💰 Fully Funded', fullyFunded.length
+        ? fullyFunded.map(i => renderItem(
+            getCardDetailsUrl(i.id, 'scholarship', i.title),
+            '💰',
+            i.title || 'Scholarship'
+          )).join('')
+        : '<div class="sw-empty">No fully funded scholarships found.</div>'
+      , 'scholarships.html')}
+      <div class="sw">
+        <div class="sw-h">🎓 Degree Levels</div>
+        ${renderPills(degrees, 'scholarships', 'level')}
+        <a class="sw-all" href="scholarships.html">View all →</a>
+      </div>
+      ${renderWidget('🌐 External Links', renderResources([
+        { name: 'HEC', url: 'https://hec.gov.pk', desc: 'Higher Education Commission' },
+        { name: 'USEFP', url: 'https://usefp.org', desc: 'US Educational Foundation in Pakistan' },
+        { name: 'Fulbright', url: 'https://fulbright.edu.pk', desc: 'Fulbright Pakistan' },
+        { name: 'DAAD', url: 'https://daad.de', desc: 'German Academic Exchange Service' }
+      ]), 'scholarships.html')}
+    `;
+
+    renderSection('sidebar-scholarships', scholarshipWidget);
+  } catch (e) { console.error('sidebar scholarships', e); }
 
   // Jobs sidebar
   try {
     const j = D.Jobs || [];
-    const gov = j.filter(i=> isGovernmentType(i.type||i.organization||'')).slice(0,4);
-    const remote = j.filter(i=> (i.location||'').toLowerCase().includes('remote')).slice(0,4);
-    const urgent = j.filter(i=> { const d = new Date(i.deadline||i.closing||i.closingDate||''), now=new Date(); return d && (d - now) / 86400000 <= 7 && d>now; }).slice(0,4);
-    const sb = document.getElementById('sidebar-jobs');
-    if (sb) {
-      sb.innerHTML = `
-        <div><strong>Government Jobs</strong><div class="mini-list" style="margin-top:8px">${gov.map(i=>`<a class="mini-item" href="${getCardDetailsUrl(i.id,'job',i.title)}"><div class="mini-icon">🏛️</div><div><div style="font-weight:700">${escapeHtml(i.title||'')}</div><div style="font-size:.82rem;color:var(--text-muted)">${escapeHtml(i.organization||i.type||'')}</div></div></a>`).join('')}</div></div>
-        <div style="margin-top:10px"><strong>Remote</strong><div class="mini-list" style="margin-top:8px">${remote.map(i=>`<a class="mini-item" href="${getCardDetailsUrl(i.id,'job',i.title)}"><div class="mini-icon">🏠</div><div><div style="font-weight:700">${escapeHtml(i.title||'')}</div></div></a>`).join('')}</div></div>
-        <div style="margin-top:10px"><strong>Urgent hiring</strong><div class="mini-list" style="margin-top:8px">${urgent.map(i=>`<a class="mini-item" href="${getCardDetailsUrl(i.id,'job',i.title)}"><div class="mini-icon">⚡</div><div><div style="font-weight:700">${escapeHtml(i.title||'')}</div><div style="font-size:.82rem;color:var(--text-muted)">${formatDate(i.deadline||i.closing||'')}</div></div></a>`).join('')}</div></div>
-        <div style="margin-top:10px"><a href="jobs.html">View all jobs →</a></div>
-      `;
-    }
-  } catch(e){console.error('sidebar jobs',e)}
+    const gov = j.filter(i => isGovernmentType(i.type || i.organization || '')).slice(0, 4);
+    const urgent = j.filter(i => {
+      const d = new Date(i.deadline || i.closing || i.closingDate || '');
+      const now = new Date();
+      return d && (d - now) / 86400000 <= 7 && d > now;
+    }).slice(0, 4);
+
+    const jobsWidget = `
+      ${renderWidget('🏛️ Govt Jobs', gov.length
+        ? gov.map(i => renderItem(
+            getCardDetailsUrl(i.id, 'job', i.title),
+            '🏛️',
+            i.title || 'Job',
+            i.organization || i.type || ''
+          )).join('')
+        : '<div class="sw-empty">No government listings yet.</div>'
+      , 'jobs.html')}
+      ${renderWidget('⚡ Urgent Hiring', urgent.length
+        ? urgent.map(i => renderItem(
+            getCardDetailsUrl(i.id, 'job', i.title),
+            '⚡',
+            i.title || 'Urgent job',
+            formatDate(i.deadline || i.closing || '')
+          )).join('')
+        : '<div class="sw-empty">No urgent openings right now.</div>'
+      , 'jobs.html')}
+      ${renderWidget('🌐 External Links', renderResources([
+        { name: 'FPSC', url: 'https://fpsc.gov.pk' },
+        { name: 'NTS', url: 'https://nts.org.pk' },
+        { name: 'rozee.pk', url: 'https://rozee.pk' },
+        { name: 'LinkedIn', url: 'https://linkedin.com/jobs' }
+      ]), 'jobs.html')}
+    `;
+
+    renderSection('sidebar-jobs', jobsWidget);
+  } catch (e) { console.error('sidebar jobs', e); }
 
   // Internships sidebar
   try {
     const I = D.Internships || [];
-    const paid = I.filter(i=> (i.type||'').toLowerCase().includes('paid')).slice(0,4);
-    const remoteI = I.filter(i=> (i.location||'').toLowerCase().includes('remote')).slice(0,4);
-    const sb = document.getElementById('sidebar-internships');
-    if (sb) {
-      sb.innerHTML = `
-        <div><strong>Paid internships</strong><div class="mini-list" style="margin-top:8px">${paid.map(i=>`<a class="mini-item" href="${getCardDetailsUrl(i.id,'internship',i.title)}"><div class="mini-icon">💼</div><div><div style="font-weight:700">${escapeHtml(i.title||'')}</div></div></a>`).join('')}</div></div>
-        <div style="margin-top:10px"><strong>Remote</strong><div class="mini-list" style="margin-top:8px">${remoteI.map(i=>`<a class="mini-item" href="${getCardDetailsUrl(i.id,'internship',i.title)}"><div class="mini-icon">🏠</div><div><div style="font-weight:700">${escapeHtml(i.title||'')}</div></div></a>`).join('')}</div></div>
-        <div style="margin-top:10px"><a href="internships.html">View all internships →</a></div>
-      `;
-    }
-  } catch(e){console.error('sidebar internships',e)}
+    const paid = I.filter(i => (i.type || '').toLowerCase().includes('paid')).slice(0, 4);
+    const remoteI = I.filter(i => (i.location || '').toLowerCase().includes('remote')).slice(0, 4);
+
+    const internshipsWidget = `
+      ${renderWidget('💼 Paid Internships', paid.length
+        ? paid.map(i => renderItem(
+            getCardDetailsUrl(i.id, 'internship', i.title),
+            '💼',
+            i.title || 'Paid internship'
+          )).join('')
+        : '<div class="sw-empty">No paid internships at the moment.</div>'
+      , 'internships.html')}
+      ${renderWidget('🏠 Remote Opportunities', remoteI.length
+        ? remoteI.map(i => renderItem(
+            getCardDetailsUrl(i.id, 'internship', i.title),
+            '🏠',
+            i.title || 'Remote internship'
+          )).join('')
+        : '<div class="sw-empty">No remote opportunities available.</div>'
+      , 'internships.html')}
+      ${renderWidget('🌐 External Links', renderResources([
+        { name: 'Internshala', url: 'https://internshala.com' },
+        { name: 'LinkedIn', url: 'https://linkedin.com' },
+        { name: 'AIESEC', url: 'https://aiesec.org' }
+      ]), 'internships.html')}
+    `;
+
+    renderSection('sidebar-internships', internshipsWidget);
+  } catch (e) { console.error('sidebar internships', e); }
 
   // Exams sidebar
   try {
     const E = D.Exams || [];
-    const upcoming = (E||[]).filter(i=> i.testDate||i.registrationDeadline).map(i=>({...i,_d:new Date(i.testDate||i.registrationDeadline)})).filter(i=>i._d && i._d>new Date()).sort((a,b)=>a._d-b._d).slice(0,6);
-    const examsByType = [...new Set((E||[]).map(i=> (i.examType||'').trim()).filter(Boolean))].slice(0,6);
-    const sb = document.getElementById('sidebar-exams');
-    if (sb) {
-      sb.innerHTML = `
-        <div><strong>Upcoming exams</strong><div class="mini-list" style="margin-top:8px">${upcoming.map(i=>`<a class="mini-item" href="${getCardDetailsUrl(i.id,'exam',i.title)}"><div class="mini-icon">📋</div><div><div style="font-weight:700">${escapeHtml(i.title||'')}</div><div style="font-size:.82rem;color:var(--text-muted)">${formatDate(i.testDate||i.registrationDeadline||'')}</div></div></a>`).join('')}</div></div>
-        <div style="margin-top:10px"><strong>Exam types</strong><div class="chip-row" style="margin-top:8px">${examsByType.map(t=>`<button class="chip" onclick="filterTo('exams','examType','${escapeJsSingleQuote(t)}')">${escapeHtml(t)}</button>`).join('')}</div></div>
-        <div style="margin-top:10px"><a href="exams.html">View exams →</a></div>
-      `;
-    }
-  } catch(e){console.error('sidebar exams',e)}
+    const upcoming = (E || [])
+      .filter(i => i.testDate || i.registrationDeadline)
+      .map(i => ({ ...i, _d: new Date(i.testDate || i.registrationDeadline) }))
+      .filter(i => i._d && i._d > new Date())
+      .sort((a, b) => a._d - b._d)
+      .slice(0, 6);
+    const examsByType = [...new Set((E || []).map(i => (i.examType || '').trim()).filter(Boolean))].slice(0, 6);
+
+    const examsWidget = `
+      ${renderWidget('📅 Upcoming Dates', upcoming.length
+        ? upcoming.map(i => renderItem(
+            getCardDetailsUrl(i.id, 'exam', i.title),
+            '📅',
+            i.title || 'Exam',
+            formatDate(i.testDate || i.registrationDeadline || '')
+          )).join('')
+        : '<div class="sw-empty">No upcoming exam dates.</div>'
+      , 'exams.html')}
+      <div class="sw">
+        <div class="sw-h">📋 Exam Types</div>
+        ${renderPills(examsByType, 'exams', 'examType')}
+        <a class="sw-all" href="exams.html">View all →</a>
+      </div>
+      ${renderWidget('🌐 External Links', renderResources([
+        { name: 'NTS', url: 'https://nts.org.pk' },
+        { name: 'FPSC', url: 'https://fpsc.gov.pk' },
+        { name: 'UHS', url: 'https://uhs.edu.pk' },
+        { name: 'PPSC', url: 'https://ppsc.gop.pk' }
+      ]), 'exams.html')}
+    `;
+
+    renderSection('sidebar-exams', examsWidget);
+  } catch (e) { console.error('sidebar exams', e); }
 
   // Books sidebar
   try {
     const B = D.Books || [];
-    const mdcat = B.filter(i=> (i.examType||'').toLowerCase().includes('mdcat')).slice(0,4);
-    const css = B.filter(i=> (i.examType||'').toLowerCase().includes('css')).slice(0,4);
-    const pdfs = B.filter(i=> i.isFree || (i.format||'').toLowerCase().includes('pdf')).slice(0,4);
-    const sb = document.getElementById('sidebar-books');
-    if (sb) {
-      sb.innerHTML = `
-        <div><strong>MDCAT books</strong><div class="mini-list" style="margin-top:8px">${mdcat.map(i=>`<a class="mini-item" href="${getCardDetailsUrl(i.id,'book',i.title)}"><div class="mini-icon">🩺</div><div><div style="font-weight:700">${escapeHtml(i.title||'')}</div></div></a>`).join('')}</div></div>
-        <div style="margin-top:10px"><strong>CSS books</strong><div class="mini-list" style="margin-top:8px">${css.map(i=>`<a class="mini-item" href="${getCardDetailsUrl(i.id,'book',i.title)}"><div class="mini-icon">⚖️</div><div><div style="font-weight:700">${escapeHtml(i.title||'')}</div></div></a>`).join('')}</div></div>
-        <div style="margin-top:10px"><strong>Free PDFs & Past Papers</strong><div class="mini-list" style="margin-top:8px">${pdfs.map(i=>`<a class="mini-item" href="${getCardDetailsUrl(i.id,'book',i.title)}"><div class="mini-icon">📄</div><div><div style="font-weight:700">${escapeHtml(i.title||'')}</div></div></a>`).join('')}</div></div>
-        <div style="margin-top:10px"><a href="books.html">View all books →</a></div>
-      `;
-    }
-  } catch(e){console.error('sidebar books',e)}
+    const mdcat = B.filter(i => (i.examType || '').toLowerCase().includes('mdcat')).slice(0, 4);
+    const pdfs = B.filter(i => i.isFree || (i.format || '').toLowerCase().includes('pdf')).slice(0, 4);
+
+    const booksWidget = `
+      ${renderWidget('📖 MDCAT Books', mdcat.length
+        ? mdcat.map(i => renderItem(
+            getCardDetailsUrl(i.id, 'book', i.title),
+            '📖',
+            i.title || 'MDCAT book'
+          )).join('')
+        : '<div class="sw-empty">No MDCAT books found.</div>'
+      , 'books.html')}
+      ${renderWidget('📄 Free PDFs', pdfs.length
+        ? pdfs.map(i => renderItem(
+            getCardDetailsUrl(i.id, 'book', i.title),
+            '📄',
+            i.title || 'Free PDF'
+          )).join('')
+        : '<div class="sw-empty">No free PDFs available.</div>'
+      , 'books.html')}
+      ${renderWidget('🌐 External Links', renderResources([
+        { name: 'Dogar Publishers', url: 'https://dogar.com.pk' },
+        { name: 'ilmkidunya', url: 'https://ilmkidunya.com' },
+        { name: 'Study Solutions', url: 'https://studysolutions.pk' }
+      ]), 'books.html')}
+    `;
+
+    renderSection('sidebar-books', booksWidget);
+  } catch (e) { console.error('sidebar books', e); }
 
   // Blogs sidebar
   try {
-    const Bl = (D.Blogs||[]).filter(b=> b.isPublished !== false && b.is_published !== false);
-    const trending = Bl.slice(0,4);
-    const study = Bl.filter(b=> (b.category||'').toLowerCase().includes('study') || (b.tags||'').toLowerCase().includes('study')).slice(0,4);
-    const career = Bl.filter(b=> (b.category||'').toLowerCase().includes('career') || (b.tags||'').toLowerCase().includes('career')).slice(0,4);
-    const sb = document.getElementById('sidebar-blogs');
-    if (sb) {
-      sb.innerHTML = `
-        <div><strong>Trending posts</strong><div class="mini-list" style="margin-top:8px">${trending.map(i=>`<a class="mini-item" href="${getCardDetailsUrl(i.id,'blog',i.title)}"><div class="mini-icon">🔥</div><div><div style="font-weight:700">${escapeHtml(i.title||'')}</div></div></a>`).join('')}</div></div>
-        <div style="margin-top:10px"><strong>Study tips</strong><div class="mini-list" style="margin-top:8px">${study.map(i=>`<a class="mini-item" href="${getCardDetailsUrl(i.id,'blog',i.title)}"><div class="mini-icon">📚</div><div><div style="font-weight:700">${escapeHtml(i.title||'')}</div></div></a>`).join('')}</div></div>
-        <div style="margin-top:10px"><strong>Career guidance</strong><div class="mini-list" style="margin-top:8px">${career.map(i=>`<a class="mini-item" href="${getCardDetailsUrl(i.id,'blog',i.title)}"><div class="mini-icon">💼</div><div><div style="font-weight:700">${escapeHtml(i.title||'')}</div></div></a>`).join('')}</div></div>
-        <div style="margin-top:10px"><a href="blog.html">View all posts →</a></div>
-      `;
-    }
-  } catch(e){console.error('sidebar blogs',e)}
+    const Bl = (D.Blogs || []).filter(b => b.isPublished !== false && b.is_published !== false);
+    const trending = Bl.slice(0, 4);
+    const study = Bl.filter(b => (b.category || '').toLowerCase().includes('study') || (b.tags || '').toLowerCase().includes('study')).slice(0, 4);
+
+    const blogsWidget = `
+      ${renderWidget('🔥 Trending Posts', trending.length
+        ? trending.map(i => renderItem(
+            getCardDetailsUrl(i.id, 'blog', i.title),
+            '🔥',
+            i.title || 'Post'
+          )).join('')
+        : '<div class="sw-empty">No trending posts yet.</div>'
+      , 'blog.html')}
+      ${renderWidget('📚 Study Tips category', study.length
+        ? study.map(i => renderItem(
+            getCardDetailsUrl(i.id, 'blog', i.title),
+            '📚',
+            i.title || 'Study tip'
+          )).join('')
+        : '<div class="sw-empty">No study tips found.</div>'
+      , 'blog.html')}
+      ${renderWidget('🌐 External Links', renderResources([
+        { name: 'Dawn', url: 'https://dawn.com' },
+        { name: 'Tribune', url: 'https://tribune.com.pk' },
+        { name: 'HEC', url: 'https://hec.gov.pk' }
+      ]), 'blog.html')}
+    `;
+
+    renderSection('sidebar-blogs', blogsWidget);
+  } catch (e) { console.error('sidebar blogs', e); }
 }
 
 function filterTo(section, field, value) {
