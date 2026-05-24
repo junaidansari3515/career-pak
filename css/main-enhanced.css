@@ -578,22 +578,23 @@ body.dark .skeleton-card {
 /* When slider is focused ensure keyboard arrows work visually */
 .horizontal-slider:focus { box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--primary) 6%, transparent 94%); }
 
-/* ── Section layout with contextual sidebar ─────────────── */
+/* ── Section layout with contextual sidebar (flex, sticky sidebars) ─────────────── */
 .home-section-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 260px;
-  gap: 20px;
+  display: flex;
+  gap: 1.5rem;
   align-items: flex-start;
   margin-bottom: 26px;
 }
-.home-section-layout .section-main { min-width: 0; }
+.home-section-layout .section-main {
+  flex: 1;
+  min-width: 0;
+}
 .home-section-layout .section-sidebar {
-  width: 260px;
-  flex: 0 0 260px;
-  margin-left: auto;
+  width: 220px;
+  flex-shrink: 0;
   position: sticky;
-  top: 96px;
-  align-self: start;
+  top: 80px;
+  align-self: flex-start;
   background: transparent;
 }
 

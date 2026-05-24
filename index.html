@@ -43,9 +43,7 @@
   <!-- Preload: only the logo renders above the fold (hero uses it as floating img).
        Banner is OG-only — remove its preload to stop it stealing bandwidth. -->
   <link rel="preload" as="image" href="logo.webp" type="image/webp" fetchpriority="high"/>
-  <!-- Preload critical font (display=swap means this is render-unblocking, but
-       preloading cuts the FOUT window) -->
-  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600;700&display=swap"/>
+    <!-- Google Fonts will load via stylesheet later (no preload to avoid duplication) -->
 
   <!-- CRITICAL CSS: style.css + main-enhanced.css drive all above-fold paint.
        Load them synchronously so the browser has tokens before first render.
@@ -55,7 +53,6 @@
 
   <!-- Non-critical CSS — loaded async via print trick, applied on load -->
   <!-- cms-additions.css and design-enhancements.css merged into main-enhanced.css -->
-  <link rel="stylesheet" href="css/premium-upgrades.css"    media="print" onload="this.media='all'"/>
   <link rel="stylesheet" href="css/perf-improvements.css"   media="print" onload="this.media='all'"/>
   <link rel="stylesheet" href="css/dark-mode-fixes.css"     media="print" onload="this.media='all'"/>
   <link rel="stylesheet" href="css/skeleton-perf.css"       media="print" onload="this.media='all'"/>
@@ -172,7 +169,7 @@
 /* ── Page shell ── */
 .home-shell{display:grid;grid-template-columns:1fr 296px;gap:2.25rem;align-items:start;}
 @media(max-width:1100px){.home-shell{grid-template-columns:1fr;}}
-.home-sidebar{position:sticky;top:72px;}
+.home-sidebar{position:sticky;top:72px;align-self:start;}
 @media(max-width:1100px){.home-sidebar{position:static;}}
 
 /* ── Section header ── */
