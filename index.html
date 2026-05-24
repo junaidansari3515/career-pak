@@ -187,11 +187,13 @@
 /* ── Slider row ── */
 .slider-wrap{position:relative;}
 .slider-row{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
+  display:flex;
   gap:1rem;
+  overflow-x:auto;
+  scroll-snap-type:x mandatory;
+  -webkit-overflow-scrolling:touch;
 }
-.slider-row .card,.slider-row .exam-card{min-width:0;}
+.slider-row .card,.slider-row .exam-card{min-width:0;flex:0 0 calc(33.333% - 0.66rem);scroll-snap-align:start}
 
 /* Hidden extra cards — shown via JS */
 .slider-extra{display:none;}
@@ -213,18 +215,7 @@
 @media(max-width:768px){
   .ai-panel{width:min(90vw,340px);right:12px;bottom:132px;max-height:min(65vh,460px);}
   .ai-fab{right:12px;bottom:78px;}
-  .slider-row{
-    display:flex;
-    flex-wrap:nowrap;
-    overflow-x:auto;
-    gap:1rem;
-    scroll-snap-type:x mandatory;
-    -webkit-overflow-scrolling:touch;
-    scrollbar-width:none;
-    -ms-overflow-style:none;
-    padding-bottom:.5rem;
-    position:relative;
-  }
+  .slider-row{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:1rem;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none;padding-bottom:.5rem;position:relative}
   .slider-row::-webkit-scrollbar{display:none;}
   .slider-row::after{
     content:'•••';
@@ -236,10 +227,8 @@
     letter-spacing:.35rem;
     pointer-events:none;
   }
-  .slider-row .card,.slider-row .exam-card{
-    flex:0 0 calc(80% - .5rem);
-    scroll-snap-align:start;
-  }
+  /* Ensure at least 2 cards are visible on small screens */
+  .slider-row .card,.slider-row .exam-card{flex:0 0 calc(50% - .5rem);scroll-snap-align:start}
   .slider-wrap::after{
     content:'';
     position:absolute;
@@ -261,11 +250,15 @@
 @media(min-width:769px) and (max-width:1100px){
   .slider-row{grid-template-columns:repeat(2,1fr);}
 }
+@media(min-width:1101px){
+  /* Ensure exactly 3 visible cards across the main content area */
+  .slider-row .card,.slider-row .exam-card{flex:0 0 calc((100% - 1rem) / 3);}
+}
 
 /* ── Home section block ── */
 .home-block{margin-bottom:2.75rem;}
 .home-section-layout{display:flex;gap:1.5rem;align-items:start;}
-.section-sidebar{width:220px;flex-shrink:0;}
+.section-sidebar{width:240px;flex-shrink:0;align-self:flex-start;position:sticky;top:88px}
 @media(max-width:1100px){.section-sidebar{display:none;}}
 
 /* ── Sidebar Widgets ── */
@@ -478,7 +471,11 @@ body.dark .sw-pill:hover{background:rgba(45,212,191,.1);border-color:#2dd4bf;col
       </div>
     </div>
   </div>
-</section>
+        </div>
+        <aside class="section-sidebar" id="sidebar-scholarships" aria-label="Scholarships sidebar">
+          <!-- Populated by js.renderSectionSidebars() -->
+        </aside>
+        </section>
 
 <!-- Stats ribbon (Exams, Books, Blog remain visible below hero) -->
 <div class="stats-ribbon" id="statsBar">
@@ -492,68 +489,172 @@ body.dark .sw-pill:hover{background:rgba(45,212,191,.1);border-color:#2dd4bf;col
     </div>
   </div>
 </div>
-
 <!-- ── Main Content ─────────────────────────────────────── -->
 <div class="section">
   <div class="container">
     <div class="home-shell">
-
-      <!-- ════ LEFT: Section Blocks ════ -->
       <main>
 
         <!-- ① SCHOLARSHIPS -->
         <section class="home-section-layout">
           <div class="section-main">
             <div class="home-block" id="block-scholarships">
-          <div class="section-hd">
-            <div class="section-hd-left">
-              <div class="section-icon" style="background:#dcfce7;color:#16a34a">🎓</div>
-              <h2 class="section-h2">Latest Scholarships</h2>
-              <span class="section-count" id="cnt-scholarships">—</span>
+              <div class="section-hd">
+                <div class="section-hd-left">
+                  <div class="section-icon" style="background:#dcfce7;color:#16a34a">🎓</div>
+                  <h2 class="section-h2">Latest Scholarships</h2>
+                  <span class="section-count" id="cnt-scholarships">—</span>
+                </div>
+                <a href="scholarships.html" class="view-all-link">View All <i class="fa fa-arrow-right fa-xs"></i></a>
+              </div>
+              <div class="slider-row horizontal-slider" id="grid-scholarships">
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+              </div>
+              <div class="slider-extra" id="extra-scholarships"></div>
+              <button class="show-more-btn" id="more-scholarships" onclick="toggleExtra('scholarships',this)" style="display:none">
+                Show More <i class="fa fa-chevron-down"></i>
+              </button>
             </div>
-            <a href="scholarships.html" class="view-all-link">View All <i class="fa fa-arrow-right fa-xs"></i></a>
           </div>
-          <div class="slider-row horizontal-slider" id="grid-scholarships">
-            <div class="skeleton-card"></div>
-            <div class="skeleton-card"></div>
-            <div class="skeleton-card"></div>
-          </div>
-          <div class="slider-extra" id="extra-scholarships"></div>
-          <button class="show-more-btn" id="more-scholarships" onclick="toggleExtra('scholarships',this)" style="display:none">
-            Show More <i class="fa fa-chevron-down"></i>
-          </button>
-            </div>
-          </div>
+          <aside class="section-sidebar" id="sidebar-scholarships" aria-label="Scholarships sidebar"></aside>
         </section>
 
         <!-- ② JOBS -->
         <section class="home-section-layout">
           <div class="section-main">
             <div class="home-block" id="block-jobs">
-          <div class="section-hd">
-            <div class="section-hd-left">
-              <div class="section-icon" style="background:#dbeafe;color:#2563eb">💼</div>
-              <h2 class="section-h2">Latest Jobs</h2>
-              <span class="section-count" id="cnt-jobs">—</span>
+              <div class="section-hd">
+                <div class="section-hd-left">
+                  <div class="section-icon" style="background:#dbeafe;color:#2563eb">💼</div>
+                  <h2 class="section-h2">Latest Jobs</h2>
+                  <span class="section-count" id="cnt-jobs">—</span>
+                </div>
+                <a href="jobs.html" class="view-all-link">View All <i class="fa fa-arrow-right fa-xs"></i></a>
+              </div>
+              <div class="slider-row horizontal-slider" id="grid-jobs">
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+              </div>
+              <div class="slider-extra" id="extra-jobs"></div>
+              <button class="show-more-btn" id="more-jobs" onclick="toggleExtra('jobs',this)" style="display:none">
+                Show More <i class="fa fa-chevron-down"></i>
+              </button>
             </div>
-            <a href="jobs.html" class="view-all-link">View All <i class="fa fa-arrow-right fa-xs"></i></a>
           </div>
-          <div class="slider-row horizontal-slider" id="grid-jobs">
-            <div class="skeleton-card"></div>
-            <div class="skeleton-card"></div>
-            <div class="skeleton-card"></div>
-          </div>
-          <div class="slider-extra" id="extra-jobs"></div>
-          <button class="show-more-btn" id="more-jobs" onclick="toggleExtra('jobs',this)" style="display:none">
-            Show More <i class="fa fa-chevron-down"></i>
-          </button>
-            </div>
-            </div>
+          <aside class="section-sidebar" id="sidebar-jobs" aria-label="Jobs sidebar"></aside>
         </section>
 
         <!-- ③ INTERNSHIPS -->
         <section class="home-section-layout">
           <div class="section-main">
+            <div class="home-block" id="block-internships">
+              <div class="section-hd">
+                <div class="section-hd-left">
+                  <div class="section-icon" style="background:#fef3c7;color:#d97706">🚀</div>
+                  <h2 class="section-h2">Latest Internships</h2>
+                  <span class="section-count" id="cnt-internships">—</span>
+                </div>
+                <a href="internships.html" class="view-all-link">View All <i class="fa fa-arrow-right fa-xs"></i></a>
+              </div>
+              <div class="slider-row horizontal-slider" id="grid-internships">
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+              </div>
+              <div class="slider-extra" id="extra-internships"></div>
+              <button class="show-more-btn" id="more-internships" onclick="toggleExtra('internships',this)" style="display:none">
+                Show More <i class="fa fa-chevron-down"></i>
+              </button>
+            </div>
+          </div>
+          <aside class="section-sidebar" id="sidebar-internships" aria-label="Internships sidebar"></aside>
+        </section>
+
+        <!-- ④ EXAMS -->
+        <section class="home-section-layout">
+          <div class="section-main">
+            <div class="home-block" id="block-exams">
+              <div class="section-hd">
+                <div class="section-hd-left">
+                  <div class="section-icon" style="background:#fce7f3;color:#db2777">📝</div>
+                  <h2 class="section-h2">Upcoming Exams</h2>
+                  <span class="section-count" id="cnt-exams">—</span>
+                </div>
+                <a href="exams.html" class="view-all-link">View All <i class="fa fa-arrow-right fa-xs"></i></a>
+              </div>
+              <div class="slider-row horizontal-slider" id="grid-exams">
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+              </div>
+              <div class="slider-extra" id="extra-exams"></div>
+              <button class="show-more-btn" id="more-exams" onclick="toggleExtra('exams',this)" style="display:none">
+                Show More <i class="fa fa-chevron-down"></i>
+              </button>
+            </div>
+          </div>
+          <aside class="section-sidebar" id="sidebar-exams" aria-label="Exams sidebar"></aside>
+        </section>
+
+        <!-- ⑤ BOOKS -->
+        <section class="home-section-layout">
+          <div class="section-main">
+            <div class="home-block" id="block-books">
+              <div class="section-hd">
+                <div class="section-hd-left">
+                  <div class="section-icon" style="background:#ede9fe;color:#7c3aed">📚</div>
+                  <h2 class="section-h2">Study Books</h2>
+                  <span class="section-count" id="cnt-books">—</span>
+                </div>
+                <a href="books.html" class="view-all-link">View All <i class="fa fa-arrow-right fa-xs"></i></a>
+              </div>
+              <div class="slider-row horizontal-slider" id="grid-books">
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+              </div>
+              <div class="slider-extra" id="extra-books"></div>
+              <button class="show-more-btn" id="more-books" onclick="toggleExtra('books',this)" style="display:none">
+                Show More <i class="fa fa-chevron-down"></i>
+              </button>
+            </div>
+          </div>
+          <aside class="section-sidebar" id="sidebar-books" aria-label="Books sidebar"></aside>
+        </section>
+
+        <!-- ⑥ BLOG -->
+        <section class="home-section-layout">
+          <div class="section-main">
+            <div class="home-block" id="block-blogs">
+              <div class="section-hd">
+                <div class="section-hd-left">
+                  <div class="section-icon" style="background:#e0f2fe;color:#0284c7">✍️</div>
+                  <h2 class="section-h2">Latest Blog Posts</h2>
+                  <span class="section-count" id="cnt-blogs">—</span>
+                </div>
+                <a href="blog.html" class="view-all-link">View All <i class="fa fa-arrow-right fa-xs"></i></a>
+              </div>
+              <div class="slider-row horizontal-slider" id="grid-blogs">
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+              </div>
+              <div class="slider-extra" id="extra-blogs"></div>
+              <button class="show-more-btn" id="more-blogs" onclick="toggleExtra('blogs',this)" style="display:none">
+                Show More <i class="fa fa-chevron-down"></i>
+              </button>
+            </div>
+          </div>
+          <aside class="section-sidebar" id="sidebar-blogs" aria-label="Blogs sidebar"></aside>
+        </section>
+
+      </main>
+    </div><!-- /home-shell -->
+  </div>
+</div>
             <div class="home-block" id="block-internships">
           <div class="section-hd">
             <div class="section-hd-left">
@@ -573,6 +674,7 @@ body.dark .sw-pill:hover{background:rgba(45,212,191,.1);border-color:#2dd4bf;col
             Show More <i class="fa fa-chevron-down"></i>
           </button>
             </div>
+          
             </div>
         </section>
 
@@ -599,9 +701,14 @@ body.dark .sw-pill:hover{background:rgba(45,212,191,.1);border-color:#2dd4bf;col
                     Show More <i class="fa fa-chevron-down"></i>
                   </button>
                 </div>
-              </div>
-            </section>
-        </div>
+                  </div>
+              
+                </div>
+                <aside class="section-sidebar" id="sidebar-exams" aria-label="Exams sidebar">
+                  <!-- Populated by js.renderSectionSidebars() -->
+                </aside>
+                </section>
+          </div>
 
         <!-- ⑤ BOOKS -->
         <div class="home-block" id="block-books">
@@ -625,10 +732,15 @@ body.dark .sw-pill:hover{background:rgba(45,212,191,.1);border-color:#2dd4bf;col
                   <button class="show-more-btn" id="more-books" onclick="toggleExtra('books',this)" style="display:none">
                     Show More <i class="fa fa-chevron-down"></i>
                   </button>
+                  </div>
+                
                 </div>
-                </div>
-            </section>
-        </div>
+              </div>
+              <aside class="section-sidebar" id="sidebar-books" aria-label="Books sidebar">
+                <!-- Populated by js.renderSectionSidebars() -->
+              </aside>
+              </section>
+            </div>
 
         <!-- ⑥ BLOG -->
         <div class="home-block" id="block-blogs">
@@ -647,126 +759,21 @@ body.dark .sw-pill:hover{background:rgba(45,212,191,.1);border-color:#2dd4bf;col
                     <div class="skeleton-card"></div>
                     <div class="skeleton-card"></div>
                     <div class="skeleton-card"></div>
-                  </div>
+                    </div>
                   <div class="slider-extra" id="extra-blogs"></div>
                   <button class="show-more-btn" id="more-blogs" onclick="toggleExtra('blogs',this)" style="display:none">
                     Show More <i class="fa fa-chevron-down"></i>
                   </button>
                 </div>
+              
                 </div>
+            </div>
+            <aside class="section-sidebar" id="sidebar-blogs" aria-label="Blogs sidebar">
+              <!-- Populated by js.renderSectionSidebars() -->
+            </aside>
             </section>
         </div>
-
-      </main>
-
-      <!-- ════ RIGHT: Sidebar ════ -->
-      <aside class="home-sidebar" aria-label="Sidebar">
-
-        <!-- Closing Soon -->
-        <div class="sw">
-          <p class="sw-h">⏰ Closing Soon</p>
-          <div id="sw-deadlines">
-            <div class="skeleton-card" style="height:50px;margin-bottom:.4rem"></div>
-            <div class="skeleton-card" style="height:50px"></div>
-          </div>
-        </div>
-
-        <!-- Featured -->
-        <div class="sw">
-          <p class="sw-h">⭐ Featured</p>
-          <div id="sw-featured">
-            <div class="skeleton-card" style="height:50px;margin-bottom:.4rem"></div>
-            <div class="skeleton-card" style="height:50px"></div>
-          </div>
-        </div>
-
-        <!-- Exam Dates -->
-        <div class="sw">
-          <p class="sw-h">📝 Exam Dates</p>
-          <div id="sw-exams"><div class="skeleton-card" style="height:50px"></div></div>
-          <a href="exams.html" class="sw-all">View all exams →</a>
-        </div>
-
-        <!-- Recent Blog Posts -->
-        <div class="sw">
-          <p class="sw-h">✍️ Recent Posts</p>
-          <div id="sw-blogs"><div class="skeleton-card" style="height:50px"></div></div>
-          <a href="blog.html" class="sw-all">View all posts →</a>
-        </div>
-
-        <!-- Category Quick Filters -->
-        <div class="sw">
-          <p class="sw-h">🏷️ Browse by Category</p>
-          <div class="sw-pills">
-            <a href="scholarships.html?funding=Fully+Funded"   class="sw-pill">🎓 Fully Funded →</a>
-            <a href="scholarships.html?funding=Partial"        class="sw-pill">💰 Partial Funded →</a>
-            <a href="jobs.html?type=Government"                class="sw-pill">🏛️ Govt Jobs →</a>
-            <a href="internships.html?type=Paid"               class="sw-pill">💼 Paid Internships →</a>
-            <a href="scholarships.html?level=Undergraduate"    class="sw-pill">📚 Undergraduate →</a>
-          </div>
-        </div>
-
-        <!-- Quick Links -->
-        <div class="sw">
-          <p class="sw-h">🔗 Quick Links</p>
-          <nav aria-label="Quick links">
-            <a href="scholarships-national.html"    class="sw-ql"><i class="fa fa-flag fa-fw"></i> National Scholarships</a>
-            <a href="scholarships-international.html" class="sw-ql"><i class="fa fa-globe fa-fw"></i> International Scholarships</a>
-            <a href="jobs-government.html"          class="sw-ql"><i class="fa fa-building fa-fw"></i> Government Jobs</a>
-            <a href="jobs-private.html"             class="sw-ql"><i class="fa fa-briefcase fa-fw"></i> Private / NGO Jobs</a>
-            <a href="exams-mdcat.html"              class="sw-ql"><i class="fa fa-stethoscope fa-fw"></i> MDCAT</a>
-            <a href="exams-css.html"                class="sw-ql"><i class="fa fa-landmark fa-fw"></i> CSS Exam</a>
-            <a href="exams-ppsc.html"               class="sw-ql"><i class="fa fa-university fa-fw"></i> PPSC</a>
-            <a href="resume-builder.html"           class="sw-ql"><i class="fa fa-file-alt fa-fw"></i> Resume Builder</a>
-            <a href="favorites.html"                class="sw-ql"><i class="fa fa-bookmark fa-fw"></i> Saved Items</a>
-            <a href="search.html"                   class="sw-ql"><i class="fa fa-search fa-fw"></i> Advanced Search</a>
-          </nav>
-        </div>
-
-        <!-- Useful External Resources -->
-        <div class="sw">
-          <p class="sw-h">🌐 External Resources</p>
-          <div class="sw-resources">
-            <a href="https://hec.gov.pk" target="_blank" rel="noopener noreferrer" class="sw-resource-item">
-              <span class="sw-resource-body">
-                <span class="sw-resource-name">HEC</span>
-                <span class="sw-resource-desc">Higher Education Commission — Scholarships &amp; grants</span>
-              </span>
-              <i class="fa fa-arrow-up-right-from-square sw-resource-icon"></i>
-            </a>
-            <a href="https://fpsc.gov.pk" target="_blank" rel="noopener noreferrer" class="sw-resource-item">
-              <span class="sw-resource-body">
-                <span class="sw-resource-name">FPSC</span>
-                <span class="sw-resource-desc">Federal Public Service Commission — Federal jobs</span>
-              </span>
-              <i class="fa fa-arrow-up-right-from-square sw-resource-icon"></i>
-            </a>
-            <a href="https://nts.org.pk" target="_blank" rel="noopener noreferrer" class="sw-resource-item">
-              <span class="sw-resource-body">
-                <span class="sw-resource-name">NTS</span>
-                <span class="sw-resource-desc">National Testing Service — Exam registration</span>
-              </span>
-              <i class="fa fa-arrow-up-right-from-square sw-resource-icon"></i>
-            </a>
-            <a href="https://usefp.org" target="_blank" rel="noopener noreferrer" class="sw-resource-item">
-              <span class="sw-resource-body">
-                <span class="sw-resource-name">USEFP</span>
-                <span class="sw-resource-desc">US-Pakistan Exchange — US scholarships &amp; exchanges</span>
-              </span>
-              <i class="fa fa-arrow-up-right-from-square sw-resource-icon"></i>
-            </a>
-            <a href="https://fulbright.edu.pk" target="_blank" rel="noopener noreferrer" class="sw-resource-item">
-              <span class="sw-resource-body">
-                <span class="sw-resource-name">Fulbright Pakistan</span>
-                <span class="sw-resource-desc">Prestigious US government fellowships</span>
-              </span>
-              <i class="fa fa-arrow-up-right-from-square sw-resource-icon"></i>
-            </a>
-          </div>
-        </div>
-
-      </aside>
-
+      
     </div><!-- /home-shell -->
   </div>
 </div>

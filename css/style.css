@@ -915,6 +915,28 @@ body.dark .stats-ribbon { background: #040e0d; }
   box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.04);
 }
 
+/* Home sections: each section gets its own contextual sidebar */
+.home-section-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 1.5rem;
+  align-items: start;
+}
+@media (max-width: 1100px) {
+  .home-section-layout { grid-template-columns: 1fr; }
+}
+
+/* Hero adapts to theme */
+.home-hero {
+  transition: background 0.4s ease, color 0.2s ease;
+}
+body.dark .home-hero {
+  background: radial-gradient(circle at 14% 10%, #022b2a, #01060b 58%, #000408);
+}
+body:not(.dark) .home-hero {
+  background: radial-gradient(circle at 14% 10%, #0d4450,#030911 58%,#02060b);
+}
+
 .filter-row {
   display: flex;
   flex-wrap: wrap;
@@ -1048,6 +1070,12 @@ body.dark .stats-ribbon { background: #040e0d; }
   height: 100%;
 }
 .card-footer { margin-top: auto; }
+
+/* Prevent card text overlap: enforce wrapping and ensure footer stays at bottom */
+.card .card-body { display: flex; flex-direction: column; gap: .5rem; min-height: 72px; overflow: hidden; }
+.card .card-body .card-title, .card .card-body strong { overflow-wrap: break-word; word-break: break-word; hyphens: auto; }
+.card .card-body p, .card .card-body span { display: block; margin: 0; line-height: 1.2; }
+.card .card-footer { margin-top: auto; }
 
 /* Search/filter rows and compact mobile controls */
 .filter-row,

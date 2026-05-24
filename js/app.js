@@ -69,6 +69,16 @@ function renderSectionSidebars() {
     if (container) container.innerHTML = html;
   };
 
+  // Helper: limit number of widgets from an HTML blob
+  const getLimitedWidgets = (html, limit = 3) => {
+    try {
+      const tmp = document.createElement('div');
+      tmp.innerHTML = html || '';
+      const sws = tmp.querySelectorAll('.sw');
+      return Array.from(sws).slice(0, limit).map(el => el.outerHTML).join('');
+    } catch (e) { return html; }
+  };
+
   // Scholarships sidebar
   try {
     const s = D.Scholarships || [];
@@ -114,7 +124,9 @@ function renderSectionSidebars() {
       ]), 'scholarships.html')}
     `;
 
-    renderSection('sidebar-scholarships', scholarshipWidget);
+    // keep per-section container (if present) and also aggregate into home sidebar
+    const schLimited = getLimitedWidgets(scholarshipWidget, 3);
+    renderSection('sidebar-scholarships', schLimited);
   } catch (e) { console.error('sidebar scholarships', e); }
 
   // Jobs sidebar
@@ -154,7 +166,8 @@ function renderSectionSidebars() {
       ]), 'jobs.html')}
     `;
 
-    renderSection('sidebar-jobs', jobsWidget);
+    const jobsLimited = getLimitedWidgets(jobsWidget, 3);
+    renderSection('sidebar-jobs', jobsLimited);
   } catch (e) { console.error('sidebar jobs', e); }
 
   // Internships sidebar
@@ -187,7 +200,8 @@ function renderSectionSidebars() {
       ]), 'internships.html')}
     `;
 
-    renderSection('sidebar-internships', internshipsWidget);
+    const internshipsLimited = getLimitedWidgets(internshipsWidget, 3);
+    renderSection('sidebar-internships', internshipsLimited);
   } catch (e) { console.error('sidebar internships', e); }
 
   // Exams sidebar
@@ -224,7 +238,8 @@ function renderSectionSidebars() {
       ]), 'exams.html')}
     `;
 
-    renderSection('sidebar-exams', examsWidget);
+    const examsLimited = getLimitedWidgets(examsWidget, 3);
+    renderSection('sidebar-exams', examsLimited);
   } catch (e) { console.error('sidebar exams', e); }
 
   // Books sidebar
@@ -257,7 +272,8 @@ function renderSectionSidebars() {
       ]), 'books.html')}
     `;
 
-    renderSection('sidebar-books', booksWidget);
+    const booksLimited = getLimitedWidgets(booksWidget, 3);
+    renderSection('sidebar-books', booksLimited);
   } catch (e) { console.error('sidebar books', e); }
 
   // Blogs sidebar
@@ -290,8 +306,11 @@ function renderSectionSidebars() {
       ]), 'blog.html')}
     `;
 
-    renderSection('sidebar-blogs', blogsWidget);
+    const blogsLimited = getLimitedWidgets(blogsWidget, 3);
+    renderSection('sidebar-blogs', blogsLimited);
   } catch (e) { console.error('sidebar blogs', e); }
+
+    // Note: per-section sidebars rendered above. No aggregated home-sidebar.
 }
 
 function filterTo(section, field, value) {
@@ -1835,6 +1854,17 @@ function initMenu() {
   window.addEventListener('resize', handleViewportChange, { passive: true });
   window.addEventListener('orientationchange', handleViewportChange, { passive: true });
   
+  // Robust delegation: handle clicks on any element with class 'hamburger'
+  if (!window.menuDelegationBound) {
+    document.addEventListener('click', (e) => {
+      const hb = e.target.closest && e.target.closest('.hamburger');
+      if (hb) {
+        e.stopPropagation();
+        toggleMenu();
+      }
+    });
+    window.menuDelegationBound = true;
+  }
   // Navbar scroll shadow
   const navEl = document.getElementById('navbar');
   if (navEl) {
@@ -2032,6 +2062,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (input) input.value = q;
       runSearch(q);
     }
+     // Populate per-section sidebars now CMS data is available
+     try { renderSectionSidebars(); } catch(e) { console.error('renderSectionSidebars', e); }
   });
 });
 
@@ -2207,7 +2239,9 @@ function initPWA() {
 
 
 function initMobileSmartFilterBar() {
-  if (window.innerWidth > 768 || document.body.classList.contains('home-page')) return;
+  // Make the filter bar auto-hide responsive on all viewports
+  // (previously only on mobile and skipped for home-page)
+  // If no filter bar present, skip.
   const bar = document.querySelector('.filter-bar');
   if (!bar) return;
 
