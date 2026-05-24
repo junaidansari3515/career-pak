@@ -536,27 +536,28 @@ body.dark .skeleton-card {
 }
 .horizontal-slider:focus { outline: none; }
 .horizontal-slider .card {
-  flex: 0 0 calc((100% / 3) - 10px);
+  min-width: 260px;
+  max-width: 340px;
+  flex: 0 0 min(340px, calc((100% - 2rem) / 3));
   scroll-snap-align: start;
   scroll-snap-stop: always;
-  max-width: none;
 }
 
 /* Desktop: minimum 3 visible */
 @media (min-width: 1024px) {
   .horizontal-slider { gap: 20px; }
-  .horizontal-slider .card { flex-basis: calc((100% / 3) - 13.333px); }
+  .horizontal-slider .card { flex: 0 0 min(340px, calc((100% - 2rem) / 3)); }
 }
 
-/* Tablet: ~2.5 visible (100% / 2.5 = 40%) */
+/* Tablet: roughly 3 visible at medium size */
 @media (min-width: 680px) and (max-width: 1023px) {
-  .horizontal-slider .card { flex: 0 0 40%; }
+  .horizontal-slider .card { flex: 0 0 min(340px, calc((100% - 2rem) / 3)); }
 }
 
-/* Mobile: visually 2 cards feel (approx 48% each) */
+/* Mobile: 2 cards visible with horizontal scroll */
 @media (max-width: 679px) {
   .horizontal-slider { gap: 10px; }
-  .horizontal-slider .card { flex: 0 0 48%; }
+  .horizontal-slider .card { flex: 0 0 min(340px, calc((100% - 1rem) / 2)); }
 }
 
 /* Hide native scrollbars but keep accessibility */

@@ -188,12 +188,23 @@
 .slider-wrap{position:relative;}
 .slider-row{
   display:flex;
+  flex-wrap:nowrap;
   gap:1rem;
   overflow-x:auto;
   scroll-snap-type:x mandatory;
   -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+  padding-bottom:.5rem;
+  position:relative;
 }
-.slider-row .card,.slider-row .exam-card{min-width:0;flex:0 0 calc(33.333% - 0.66rem);scroll-snap-align:start}
+.slider-row::-webkit-scrollbar{display:none;}
+.slider-row .card,.slider-row .exam-card{
+  min-width:260px;
+  max-width:340px;
+  flex:0 0 min(340px, calc((100% - 2rem) / 3));
+  scroll-snap-align:start;
+}
 
 /* Hidden extra cards — shown via JS */
 .slider-extra{display:none;}
@@ -227,8 +238,8 @@
     letter-spacing:.35rem;
     pointer-events:none;
   }
-  /* Ensure at least 2 cards are visible on small screens */
-  .slider-row .card,.slider-row .exam-card{flex:0 0 calc(50% - .5rem);scroll-snap-align:start}
+  /* Ensure 2 cards remain visible on mobile screens */
+  .slider-row .card,.slider-row .exam-card{flex:0 0 min(340px, calc((100% - 1rem) / 2));scroll-snap-align:start;}
   .slider-wrap::after{
     content:'';
     position:absolute;
@@ -241,18 +252,12 @@
   }
   .show-more-btn{display:none;}
 }
-@media(min-width:481px) and (max-width:768px){
-  .slider-row .card,.slider-row .exam-card{
-    flex:0 0 calc(50% - .5rem);
-    scroll-snap-align:start;
-  }
-}
 @media(min-width:769px) and (max-width:1100px){
-  .slider-row{grid-template-columns:repeat(2,1fr);}
+  .slider-row .card,.slider-row .exam-card{flex:0 0 min(340px, calc((100% - 2rem) / 3));max-width:340px;}
 }
 @media(min-width:1101px){
-  /* Ensure exactly 3 visible cards across the main content area */
-  .slider-row .card,.slider-row .exam-card{flex:0 0 calc((100% - 1rem) / 3);}
+  /* Ensure 3 cards remain visible in desktop view */
+  .slider-row .card,.slider-row .exam-card{flex:0 0 min(340px, calc((100% - 2rem) / 3));max-width:340px;}
 }
 
 /* ── Home section block ── */
