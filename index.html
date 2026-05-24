@@ -257,9 +257,9 @@
 
 /* ── Home section block ── */
 .home-block{margin-bottom:2.75rem;}
-.home-section-layout{display:flex;gap:1.5rem;align-items:start;}
-.section-sidebar{width:240px;flex-shrink:0;align-self:flex-start;position:sticky;top:88px}
-@media(max-width:1100px){.section-sidebar{display:none;}}
+.home-section-layout{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:1.5rem;align-items:start;}
+.section-sidebar{width:260px;flex-shrink:0;align-self:flex-start;position:sticky;top:88px;margin-left:auto;}
+@media(max-width:1100px){.home-section-layout{grid-template-columns:1fr;}.section-sidebar{position:static;width:auto;top:auto;margin-left:0;}}
 
 /* ── Sidebar Widgets ── */
 .sw{background:var(--bg-card,#fff);border:1px solid var(--border,#e2e8f0);border-radius:14px;padding:1.1rem;margin-bottom:1.2rem;}
@@ -471,8 +471,7 @@ body.dark .sw-pill:hover{background:rgba(45,212,191,.1);border-color:#2dd4bf;col
       </div>
     </div>
   </div>
-        </div>
-        </section>
+</section>
 
 <!-- Stats ribbon (Exams, Books, Blog remain visible below hero) -->
 <div class="stats-ribbon" id="statsBar">
@@ -649,128 +648,6 @@ body.dark .sw-pill:hover{background:rgba(45,212,191,.1);border-color:#2dd4bf;col
         </section>
 
       </main>
-    </div><!-- /home-shell -->
-  </div>
-</div>
-            <div class="home-block" id="block-internships">
-          <div class="section-hd">
-            <div class="section-hd-left">
-              <div class="section-icon" style="background:#fef3c7;color:#d97706">🚀</div>
-              <h2 class="section-h2">Latest Internships</h2>
-              <span class="section-count" id="cnt-internships">—</span>
-            </div>
-            <a href="internships.html" class="view-all-link">View All <i class="fa fa-arrow-right fa-xs"></i></a>
-          </div>
-          <div class="slider-row horizontal-slider" id="grid-internships">
-            <div class="skeleton-card"></div>
-            <div class="skeleton-card"></div>
-            <div class="skeleton-card"></div>
-          </div>
-          <div class="slider-extra" id="extra-internships"></div>
-          <button class="show-more-btn" id="more-internships" onclick="toggleExtra('internships',this)" style="display:none">
-            Show More <i class="fa fa-chevron-down"></i>
-          </button>
-            </div>
-          
-            </div>
-        </section>
-
-        <!-- ④ EXAMS -->
-        <div class="home-block" id="block-exams">
-            <section class="home-section-layout">
-              <div class="section-main">
-                <div class="home-block" id="block-exams">
-                  <div class="section-hd">
-                    <div class="section-hd-left">
-                      <div class="section-icon" style="background:#fce7f3;color:#db2777">📝</div>
-                      <h2 class="section-h2">Upcoming Exams</h2>
-                      <span class="section-count" id="cnt-exams">—</span>
-                    </div>
-                    <a href="exams.html" class="view-all-link">View All <i class="fa fa-arrow-right fa-xs"></i></a>
-                  </div>
-                  <div class="slider-row horizontal-slider" id="grid-exams">
-                    <div class="skeleton-card"></div>
-                    <div class="skeleton-card"></div>
-                    <div class="skeleton-card"></div>
-                  </div>
-                  <div class="slider-extra" id="extra-exams"></div>
-                  <button class="show-more-btn" id="more-exams" onclick="toggleExtra('exams',this)" style="display:none">
-                    Show More <i class="fa fa-chevron-down"></i>
-                  </button>
-                </div>
-                  </div>
-              
-                </div>
-                <aside class="section-sidebar" id="sidebar-exams" aria-label="Exams sidebar">
-                  <!-- Populated by js.renderSectionSidebars() -->
-                </aside>
-                </section>
-          </div>
-
-        <!-- ⑤ BOOKS -->
-        <div class="home-block" id="block-books">
-            <section class="home-section-layout">
-              <div class="section-main">
-                <div class="home-block" id="block-books">
-                  <div class="section-hd">
-                    <div class="section-hd-left">
-                      <div class="section-icon" style="background:#ede9fe;color:#7c3aed">📚</div>
-                      <h2 class="section-h2">Study Books</h2>
-                      <span class="section-count" id="cnt-books">—</span>
-                    </div>
-                    <a href="books.html" class="view-all-link">View All <i class="fa fa-arrow-right fa-xs"></i></a>
-                  </div>
-                  <div class="slider-row horizontal-slider" id="grid-books">
-                    <div class="skeleton-card"></div>
-                    <div class="skeleton-card"></div>
-                    <div class="skeleton-card"></div>
-                  </div>
-                  <div class="slider-extra" id="extra-books"></div>
-                  <button class="show-more-btn" id="more-books" onclick="toggleExtra('books',this)" style="display:none">
-                    Show More <i class="fa fa-chevron-down"></i>
-                  </button>
-                  </div>
-                
-                </div>
-              </div>
-              <aside class="section-sidebar" id="sidebar-books" aria-label="Books sidebar">
-                <!-- Populated by js.renderSectionSidebars() -->
-              </aside>
-              </section>
-            </div>
-
-        <!-- ⑥ BLOG -->
-        <div class="home-block" id="block-blogs">
-            <section class="home-section-layout">
-              <div class="section-main">
-                <div class="home-block" id="block-blogs">
-                  <div class="section-hd">
-                    <div class="section-hd-left">
-                      <div class="section-icon" style="background:#e0f2fe;color:#0284c7">✍️</div>
-                      <h2 class="section-h2">Latest Blog Posts</h2>
-                      <span class="section-count" id="cnt-blogs">—</span>
-                    </div>
-                    <a href="blog.html" class="view-all-link">View All <i class="fa fa-arrow-right fa-xs"></i></a>
-                  </div>
-                  <div class="slider-row horizontal-slider" id="grid-blogs">
-                    <div class="skeleton-card"></div>
-                    <div class="skeleton-card"></div>
-                    <div class="skeleton-card"></div>
-                    </div>
-                  <div class="slider-extra" id="extra-blogs"></div>
-                  <button class="show-more-btn" id="more-blogs" onclick="toggleExtra('blogs',this)" style="display:none">
-                    Show More <i class="fa fa-chevron-down"></i>
-                  </button>
-                </div>
-              
-                </div>
-            </div>
-            <aside class="section-sidebar" id="sidebar-blogs" aria-label="Blogs sidebar">
-              <!-- Populated by js.renderSectionSidebars() -->
-            </aside>
-            </section>
-        </div>
-      
     </div><!-- /home-shell -->
   </div>
 </div>

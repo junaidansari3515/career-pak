@@ -579,15 +579,17 @@ body.dark .skeleton-card {
 
 /* ── Section layout with contextual sidebar ─────────────── */
 .home-section-layout {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
   gap: 20px;
   align-items: flex-start;
   margin-bottom: 26px;
 }
-.home-section-layout .section-main { flex: 1 1 auto; }
+.home-section-layout .section-main { min-width: 0; }
 .home-section-layout .section-sidebar {
   width: 260px;
   flex: 0 0 260px;
+  margin-left: auto;
   position: sticky;
   top: 96px;
   align-self: start;
@@ -604,8 +606,8 @@ body.dark .skeleton-card {
 
 /* Tablet: sidebar flows below main content */
 @media (max-width: 1024px) {
-  .home-section-layout { flex-direction: column; }
-  .home-section-layout .section-sidebar { position: static; width: auto; flex: none; top: auto; }
+  .home-section-layout { grid-template-columns: 1fr; }
+  .home-section-layout .section-sidebar { position: static; width: auto; flex: none; top: auto; margin-left: 0; }
 }
 
 /* Mobile: convert sidebar into horizontal chips row */
