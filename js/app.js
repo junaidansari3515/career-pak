@@ -2213,11 +2213,11 @@ function initGlobalSitePolish() {
 function initPWA() {
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const regs = await navigator.serviceWorker.getRegistrations().catch(() => []);
-      await Promise.all(regs.map((reg) => reg.unregister().catch(() => false)));
-      if (window.caches && typeof window.caches.keys === 'function') {
-        const keys = await window.caches.keys().catch(() => []);
-        await Promise.all(keys.map((key) => window.caches.delete(key).catch(() => false)));
+      try {
+        await navigator.serviceWorker.register('/service-worker.js');
+        console.log('Service worker registered');
+      } catch (err) {
+        console.warn('Service worker registration failed', err);
       }
     });
   }
@@ -2229,10 +2229,13 @@ function initPWA() {
     if (!installBtn) return;
     installBtn.style.display = 'inline-flex';
     installBtn.onclick = async () => {
+      if (!deferredPrompt) return;
       deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
+      const choice = await deferredPrompt.userChoice.catch(() => null);
+      if (choice && choice.outcome === 'accepted') {
+        installBtn.style.display = 'none';
+      }
       deferredPrompt = null;
-      installBtn.style.display = 'none';
     };
   });
 }
